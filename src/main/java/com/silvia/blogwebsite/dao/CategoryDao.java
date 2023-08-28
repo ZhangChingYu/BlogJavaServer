@@ -13,10 +13,11 @@ public class CategoryDao {
         this.connection = connection;
     }
 
-    public void insertCategory(String name){
-        String sql = "INSERT INTO "+tableName+" (name) VALUES (?)";
+    public void insertCategory(int root, String name){
+        String sql = "INSERT INTO "+tableName+" (root, name) VALUES (?, ?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)){
-            preparedStatement.setString(1, name);
+            preparedStatement.setInt(1, root);
+            preparedStatement.setString(2, name);
             int affectedRows = preparedStatement.executeUpdate();
             if (affectedRows > 0) {
                 try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
@@ -38,22 +39,42 @@ public class CategoryDao {
             ResultSet resultSet = statement.executeQuery(sql)){
             while (resultSet.next()){
                 int id = resultSet.getInt("id");
+                int root = resultSet.getInt("root");
                 String name = resultSet.getString("name");
-                categories.add(new Category(id, name));
+                categories.add(new Category(id, root, name));
             }
         }catch (SQLException e){
             System.out.println("Get All Category Error! " + e);
         }
-        return  categories;
+        return categories;
     }
+
+    public List<Category> getCategoryByRoot(int root){
+        List<Category> categories = new ArrayList<>();
+        String sql = "SELECT * FROM " + tableName + " WHERE root = ?";
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, root);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()){
+                int id = resultSet.getInt("id");
+                String name = resultSet.getString("name");
+                categories.add(new Category(id, root, name));
+            }
+        } catch (SQLException e){
+            System.out.println("[Get Category By Root Error]: Result Set " + e);
+        }
+        return categories;
+    }
+
     public Category getCategoryById(int id){
         String sql = "SELECT * FROM " + tableName + " WHERE id = ?";
         try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, id);
             try(ResultSet resultSet = preparedStatement.executeQuery()) {
                 if(resultSet.next()){
+                    int root = resultSet.getInt("root");
                     String name = resultSet.getString("name");
-                    return new Category(id, name);
+                    return new Category(id, root, name);
                 }
             } catch (SQLException e){
                 System.out.println("[Get Category By Id Error]: Result Set " + e);
@@ -85,9 +106,5 @@ public class CategoryDao {
         }catch (SQLException e){
             System.out.println("[Delete Category Error]: " + e);
         }
-    }
-
-    public static void main(String[] args) {
-
     }
 }

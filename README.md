@@ -19,6 +19,12 @@
              * RootHandler.java
              * ApiHandler.java
              * ...
+           * controllers `// 控制器`
+             * SearchController.java `// 處理查詢請求的控制器`
+             * ...
+           * services `// 業務邏輯執行`
+             * SearchService.java `// 實現查詢服務的類`
+             * ...
            * dao`// 數據庫訪問對象`
              * UserDao.java
              * ...
@@ -45,7 +51,59 @@
 ***
 ## 實現流程：
 ### 1. 數據庫操作
-主要是對MySQL數據表進行增刪改查的操作，首先需要引入MySQL提供的驅動API: JDBC，
+主要是對MySQL數據表進行增刪改查的操作，首先需要引入MySQL提供的驅動API: JDBC，接著實現數據庫 **MySQL** 的連接方法，我們將建立連接與數據庫的業務邏輯區分開，由 **ConnectionManager** 類負責與數據庫連接。
+
+    // build mysql connection
+    public static Connection getConnection() throws SQLException {
+        if(connection == null || connection.isClosed()){
+            String database = "blog";
+            String jdbcUrl = "jdbc:mysql://localhost:3306/"+database;
+            String username = "root";
+            String password = "Sunny.1218";
+            connection = DriverManager.getConnection(jdbcUrl, username, password);
+        }
+        return connection;
+    }
+    // close database connection manually
+    public static void closeConnection() throws SQLException {
+        if(connection != null || !connection.isClosed()){
+            connection.close();
+        }
+    }
+
+接著為數據庫的數據編寫對應的實體類並統一放置在 **/models/** 文件夾下方便管理。
+
+    public class Category{
+        private int id;
+        private String name;
+        ...
+    }
+
+有了對應的實體類後根據項目的需求實現像硬的數據操作方法，例如簡單的增刪查改，數據庫操作的方法實現統一放置在 **/dao/** 文件夾下管理。
+
+    public class CategoryDao {
+        private final Connection connection;
+        public CategoryDao(Connection connection){
+            this.connection = connection;
+        }
+        // 數據插入
+        public void insertCategory(String name){...}
+
+        // 數據查詢
+        public List<Category> getAllCategory(){
+            List<Category> categories = new ArrayList<>();
+            ...
+            return  categories;
+        }
+
+        // 數據更改
+        public void updateCategory(int id, String newName){...}
+        
+        // 數據刪除
+        public void deleteCategory(int id){...}
+    }
+### 2. 業務邏輯實現
+在傳統的三層架構（MVC 架構）中，業務邏輯通常由控制器（Controller）來管理和實現。控制器負責接收來自用戶界面的請求，處理相應的業務邏輯，然後根據結果生成響應返回給用戶。
 
 ***
 ## 後端接口
