@@ -8,7 +8,7 @@ import java.util.List;
 
 public class CategoryDao {
     private final String tableName = "blog_cate";
-    private Connection connection;
+    private final Connection connection;
     public CategoryDao(Connection connection){
         this.connection = connection;
     }
@@ -87,7 +87,7 @@ public class CategoryDao {
         }
     }
 
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) {
 
     }
 }
