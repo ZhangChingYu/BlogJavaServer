@@ -14,7 +14,7 @@ public class CategoryDao {
     }
 
     public void insertCategory(String name){
-        String sql = "INSERT INTO "+tableName+" (name) VALUES (?)";
+        String sql = "INSERT INTO blog_cate (name) VALUES (?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)){
             preparedStatement.setString(1, name);
             int affectedRows = preparedStatement.executeUpdate();
