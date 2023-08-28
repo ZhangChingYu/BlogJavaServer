@@ -10,7 +10,7 @@ public enum ArticleTags {
     PICTURE("[P]"),
     INTRODUCTION("[I]");
 
-    private String value;
+    private final String value;
 
     ArticleTags(String s) {
         this.value = s;
