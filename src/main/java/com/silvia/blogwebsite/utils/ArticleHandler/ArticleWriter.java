@@ -14,8 +14,8 @@ import java.util.Date;
 
 public class ArticleWriter {
     private final String fileRoot = "media/article";
-    private Article article;
-    private String fileName;
+    private final Article article;
+    private final String fileName;
 
     public ArticleWriter(Article article, String fileName) {
         this.article = article;
@@ -74,8 +74,7 @@ public class ArticleWriter {
     }
 
     private static String tagWrapper(String tag, String content){
-        String result = tag + "\n" + content + "\n" + tag;
-        return result;
+        return tag + "\n" + content + "\n" + tag;
     }
 
     private static String elementConnector(List<String> elements){
@@ -83,7 +82,7 @@ public class ArticleWriter {
         if (elements.size() == 1){
             return elements.get(0);
         }
-        if(elements != null && !elements.isEmpty()){
+        if(!elements.isEmpty()){
             for(int i=0;i<elements.size()-1;i++){
                 content.append(elements.get(i)).append("\n");
             }

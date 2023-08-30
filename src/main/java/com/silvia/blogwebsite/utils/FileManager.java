@@ -66,13 +66,4 @@ public class FileManager {
         }
         return lastUpdate;
     }
-
-    public static void main(String[] args) {
-        /**
-        String createTime = getFileCreatedTime("media/article/2023/08/");
-        String lastUpdate = getFileLatestUpdate("media/article/2023/08/");
-        System.out.println(createTime);
-        System.out.println(lastUpdate);
-         **/
-    }
 }
