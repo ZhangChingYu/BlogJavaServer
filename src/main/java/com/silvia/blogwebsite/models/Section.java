@@ -7,6 +7,17 @@ public class Section {
     private String title;
     private String intro;
     private List<String> picList;
+
+    public Section(int sectionType, String title, String intro, List<String> picList) {
+        this.sectionType = sectionType;
+        this.title = title;
+        this.intro = intro;
+        this.picList = picList;
+    }
+
+    public Section() {
+    }
+
     public int getSectionType() {
         return sectionType;
     }

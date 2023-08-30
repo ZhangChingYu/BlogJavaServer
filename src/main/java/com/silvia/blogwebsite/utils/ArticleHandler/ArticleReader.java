@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class ArticleManager {
-    private ArticleManager(){}
+public class ArticleReader {
+    private ArticleReader(){}
     public static Article readArticle(String filePath){
         Article article = new Article();
         int headerType = 0;
@@ -22,50 +22,68 @@ public class ArticleManager {
         try(BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = reader.readLine()) != null){
+                // [H]: if the Header tag is detected, start decipher header part.
                 if(line.equals(ArticleTags.HEADER.getValue())){
+                    // [H]: the decipher process will stop when another Header tag is detected.
                     while (!(line = reader.readLine()).equals(ArticleTags.HEADER.getValue())){
-                        String type = line;
+                        String type = line;         // the type of the header [A], [B], or [C]
                         headerType = getType(line);
+                        // not until the same type tag is detected will the decipher stop.
                         while (!(line = reader.readLine()).equals(type)){
+                            // [T]: if the Title tag is detected, start decipher title.
                             if (line.equals(ArticleTags.TITLE.getValue())){
+                                // [T]: the decipher process will stop when another Title tag is detected.
                                 while (!(line = reader.readLine()).equals(ArticleTags.TITLE.getValue())){
-                                    title.append(line);
+                                    title.append(line);     // get the title of the article
                                 }
                             }
+                            // [I]
                             if (line.equals(ArticleTags.INTRODUCTION.getValue())){
+                                // [I]
                                 while (!(line = reader.readLine()).equals(ArticleTags.INTRODUCTION.getValue())){
-                                    intro.append(line).append("\n");
+                                    intro.append(line).append("\n");    // get the introduction of the article
                                 }
                             }
+                            // [P]
                             if (line.equals(ArticleTags.PICTURE.getValue())){
+                                // [P]
                                 while (!(line = reader.readLine()).equals(ArticleTags.PICTURE.getValue())){
-                                    picture = line;
+                                    picture = line;     // get the cover picture's url of the article
                                 }
                             }
                         }
                     }
                 }
+                // [S]: start decipher the Section part
                 if(line.equals(ArticleTags.SECTION.getValue())){
+                    // [S]
                     while (!(line = reader.readLine()).equals(ArticleTags.SECTION.getValue())){
-                        Section section = new Section();
-                        String sectionType = line;
+                        Section section = new Section();                // new a Section entity to store the values
+                        String sectionType = line;                      // get the type of the Section [A], [B], or [C]
                         StringBuilder s_title = new StringBuilder();
                         StringBuilder s_intro = new StringBuilder();
                         List<String> picList = new ArrayList<>();
+                        // stop decipher this section when the same section type is detected.
                         while (!(line = reader.readLine()).equals(sectionType)){
+                            // [T]
                             if(line.equals(ArticleTags.TITLE.getValue())){
+                                // [T]
                                 while (!(line = reader.readLine()).equals(ArticleTags.TITLE.getValue())){
-                                    s_title.append(line);
+                                    s_title.append(line);       // get the section Title.
                                 }
                             }
+                            // [I]
                             if(line.equals(ArticleTags.INTRODUCTION.getValue())){
+                                // [I]
                                 while (!(line = reader.readLine()).equals(ArticleTags.INTRODUCTION.getValue())){
-                                    s_intro.append(line).append("\n");
+                                    s_intro.append(line).append("\n");      // get the section introduction
                                 }
                             }
+                            // [P]: if a Picture tag is detected, get the url value of the picture.
                             if(line.equals(ArticleTags.PICTURE.getValue())){
+                                // [P]
                                 while (!(line = reader.readLine()).equals(ArticleTags.PICTURE.getValue())){
-                                    picList.add(line);
+                                    picList.add(line);      // get the Picture and add it to the picture list.
                                 }
                             }
                         }
@@ -100,6 +118,7 @@ public class ArticleManager {
         }
         return type;
     }
+
     public static void main(String[] args) {
         String filePath = "media/article/2023/08/02-id-title";
         Article article = readArticle(filePath);

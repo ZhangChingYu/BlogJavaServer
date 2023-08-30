@@ -23,7 +23,7 @@ public class CategoryDao {
                 try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
                         int generatedId = generatedKeys.getInt(1);
-                        System.out.println("Inserted user with ID: " + generatedId);
+                        System.out.println("Inserted category with ID: " + generatedId);
                     }
                 }
             }
