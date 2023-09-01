@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class CategoryServiceImpl implements CategoryService{
-    private CategoryDao categoryDao;
+    private final CategoryDao categoryDao;
     public CategoryServiceImpl() {
         try {
             this.categoryDao = new CategoryDao(ConnectionManager.getConnection());
@@ -18,33 +18,28 @@ public class CategoryServiceImpl implements CategoryService{
     }
     @Override
     public List<Category> getCategoryByTheme(int themeId) {
-        List<Category> categories = categoryDao.getCategoryByRoot(themeId);
-        return categories;
+        return categoryDao.getCategoryByRoot(themeId);
     }
 
     @Override
     public List<Category> getAllCategory() {
-        List<Category> categories = categoryDao.getAllCategory();
-        return categories;
+        return categoryDao.getAllCategory();
     }
 
     @Override
     public Category getCategoryById(int id) {
-        Category category = categoryDao.getCategoryById(id);
-        return category;
+        return categoryDao.getCategoryById(id);
     }
 
     @Override
     public int addCategory(int themeId, String name) {
-        int generatedId = categoryDao.insertCategory(themeId, name);
-        return generatedId;
+        return categoryDao.insertCategory(themeId, name);
     }
 
     @Override
     public Category updateCategory(int id, String newName) {
         categoryDao.updateCategory(id, newName);
-        Category category = getCategoryById(id);
-        return category;
+        return getCategoryById(id);
     }
 
     @Override

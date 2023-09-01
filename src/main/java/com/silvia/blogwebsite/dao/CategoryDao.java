@@ -1,7 +1,6 @@
 package com.silvia.blogwebsite.dao;
 
 import com.silvia.blogwebsite.models.Category;
-import com.silvia.blogwebsite.sqlConnector.ConnectionManager;
 
 import java.sql.*;
 import java.util.ArrayList;

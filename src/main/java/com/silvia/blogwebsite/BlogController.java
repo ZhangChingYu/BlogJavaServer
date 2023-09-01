@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 public class BlogController {
-    private Map<Pattern, HttpHandler> handlers = new HashMap<>();
+    private final Map<Pattern, HttpHandler> handlers = new HashMap<>();
     public BlogController(){
         handlers.put(Pattern.compile("/categories.*"), new CategoryHandler());
         //handlers.put("/categories/test", new CategoryHandler());
