@@ -1,4 +1,4 @@
-package com.silvia.blogwebsite.utils.ArticleHandler;
+package com.silvia.blogwebsite.utils.ArticleUtil;
 
 public enum ArticleTags {
     HEADER("[H]"),
