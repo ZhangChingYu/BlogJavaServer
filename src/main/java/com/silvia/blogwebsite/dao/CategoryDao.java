@@ -1,6 +1,7 @@
 package com.silvia.blogwebsite.dao;
 
 import com.silvia.blogwebsite.models.Category;
+import com.silvia.blogwebsite.sqlConnector.ConnectionManager;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -13,8 +14,9 @@ public class CategoryDao {
         this.connection = connection;
     }
 
-    public void insertCategory(int root, String name){
+    public int insertCategory(int root, String name){
         String sql = "INSERT INTO "+tableName+" (root, name) VALUES (?, ?)";
+        int generatedId = 0;
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)){
             preparedStatement.setInt(1, root);
             preparedStatement.setString(2, name);
@@ -22,7 +24,7 @@ public class CategoryDao {
             if (affectedRows > 0) {
                 try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
-                        int generatedId = generatedKeys.getInt(1);
+                        generatedId = generatedKeys.getInt(1);
                         System.out.println("Inserted category with ID: " + generatedId);
                     }
                 }
@@ -30,6 +32,7 @@ public class CategoryDao {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+        return generatedId;
     }
 
     public List<Category> getAllCategory(){
@@ -95,6 +98,27 @@ public class CategoryDao {
         } catch (SQLException e){
             System.out.println("[Update Category Error]: " + e);
         }
+    }
+
+    public boolean checkUpdate(int id, String newName){
+        String sql = "SELECT COUNT(*) FROM " + tableName + " WHERE id = ? AND name = ?";
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, id);
+            preparedStatement.setString(2, newName);
+            try(ResultSet resultSet = preparedStatement.executeQuery()) {
+                if(resultSet.next()){
+                    int count = resultSet.getInt(1);
+                    if(count > 0){
+                        return true;
+                    }
+                }
+            } catch (SQLException e){
+                System.out.println("[Get Category By Id Error]: Result Set " + e);
+            }
+        } catch (SQLException e){
+            System.out.println("[Get Category By Id Error]: Prepare Statement " + e);
+        }
+        return false;
     }
 
     public void deleteCategory(int id){
