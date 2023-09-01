@@ -2,6 +2,7 @@ package com.silvia.blogwebsite;
 
 import com.silvia.blogwebsite.handlers.CategoryHandler;
 import com.silvia.blogwebsite.handlers.HelloHandler;
+import com.silvia.blogwebsite.handlers.PictureHandler;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
@@ -15,6 +16,7 @@ public class BlogController {
     private final Map<Pattern, HttpHandler> handlers = new HashMap<>();
     public BlogController(){
         handlers.put(Pattern.compile("/categories.*"), new CategoryHandler());
+        handlers.put(Pattern.compile("/images.*"), new PictureHandler());
         handlers.put(Pattern.compile("/hello.*"), new HelloHandler());
     }
 

@@ -2,7 +2,6 @@ package com.silvia.blogwebsite.handlers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.databind.util.JSONWrappedObject;
 import com.silvia.blogwebsite.models.Category;
 import com.silvia.blogwebsite.services.CategoryService;
 import com.silvia.blogwebsite.services.CategoryServiceImpl;
