@@ -15,7 +15,6 @@ public class BlogController {
     private final Map<Pattern, HttpHandler> handlers = new HashMap<>();
     public BlogController(){
         handlers.put(Pattern.compile("/categories.*"), new CategoryHandler());
-        //handlers.put("/categories/test", new CategoryHandler());
         handlers.put(Pattern.compile("/hello.*"), new HelloHandler());
     }
 
