@@ -6,8 +6,8 @@ import com.silvia.blogwebsite.models.Section;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.sql.Date;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class ArticleReader {
@@ -100,7 +100,7 @@ public class ArticleReader {
         }
         article.setHeaderType(headerType);
         article.setTitle(title.toString());
-        article.setDate(new Date("2023/08/02"));
+        article.setDate(new Date(2023, 8, 2));
         article.setIntro(intro.toString());
         article.setCoverImgUrl(picture);
         article.setSectionList(sectionList);

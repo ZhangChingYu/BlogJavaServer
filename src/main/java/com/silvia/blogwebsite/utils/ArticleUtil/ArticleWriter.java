@@ -7,10 +7,10 @@ import com.silvia.blogwebsite.utils.FileManager;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Date;
 
 public class ArticleWriter {
     private final String fileRoot = "media/article";
@@ -140,7 +140,7 @@ public class ArticleWriter {
 
         sectionList.add(new Section(2,"section title","section introduction",picList));
         sectionList.add(new Section(3,"section title","section introduction",picList2));
-        Article a = new Article("title","introduction","cover image",1,new Date("2023/02/02"), sectionList);
+        Article a = new Article("title","introduction","cover image",1,new Date(2023, 2, 2), sectionList);
         ArticleWriter articleWriter = new ArticleWriter(a, "test");
         String content = articleWriter.contentBuilder();
         try {

@@ -1,14 +1,16 @@
 package com.silvia.blogwebsite.handlers;
 
+
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class PictureHandler implements HttpHandler {
+    private static final int MAX_TOTAL_SIZE = 100 * 1024 * 1024; // 100MB
+    private static final int MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String method = exchange.getRequestMethod();
@@ -46,11 +48,37 @@ public class PictureHandler implements HttpHandler {
                 }
             }
             case "POST" -> {
+                if(path.equals("/images/upload")){
+                    System.out.println("Image Posting...");
+                    // 解析文件數據
+                    InputStream inputStream = exchange.getRequestBody();
+                    String fileName = exchange.getRequestHeaders().getFirst("Content-Disposition").replaceFirst("(?i)^.*filename=\"([^\"]+)\".*$", "$1");
+                    String fileType = "." + exchange.getRequestHeaders().getFirst("Content-Type").split("/")[1];
+                    System.out.println("[Get File Name]: " + fileName);
+                    System.out.println("[Get File Type]: " + fileType);
+                    byte[] fileBytes = inputStream.readAllBytes();
 
+                    // 將文件保存到目標目錄
+                    String response;
+                    if(fileHandler(fileBytes, fileName+fileType)){
+                        // 回傳成功響應給前端
+                        response = "File uploaded successfully!";
+                        exchange.sendResponseHeaders(200, response.length());
+                    }
+                    else {
+                        // 回傳失敗響應給前端
+                        response = "File uploaded failed!";
+                        exchange.sendResponseHeaders(405, response.length());
+                    }
+                    os = exchange.getResponseBody();
+                    os.write(response.getBytes());
+                    os.close();
+                }
             }
             default -> {}
         }
     }
+
     // 根據文件的擴展名判斷 Content-Type
     private String determineContentType(String filePath) {
         if (filePath.endsWith(".jpg") || filePath.endsWith(".jpeg")) {
@@ -61,6 +89,17 @@ public class PictureHandler implements HttpHandler {
             return "image/gif";
         } else {
             return "application/octet-stream"; // 默認二進制流
+        }
+    }
+    private boolean fileHandler(byte[] fileBytes, String fileName){
+        // 將文件保存到目標目錄
+        Path targetDirectory = Path.of("media/image/");
+        Path filePath = targetDirectory.resolve(fileName);
+        try {
+            Files.write(filePath, fileBytes);
+            return true;
+        } catch (IOException e) {
+            return false;
         }
     }
 }

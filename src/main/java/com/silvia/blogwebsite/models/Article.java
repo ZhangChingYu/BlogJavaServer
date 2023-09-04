@@ -1,6 +1,6 @@
 package com.silvia.blogwebsite.models;
 
-import java.util.Date;
+import java.sql.Date;
 import java.util.List;
 
 public class Article {
@@ -11,6 +11,7 @@ public class Article {
     private int headerType;     // 1, 2, 3
     private Date date;
     private String category;
+    private List<Section> sectionList;
 
     public String getCategory() {
         return category;
@@ -35,7 +36,6 @@ public class Article {
         this.sectionList = sectionList;
     }
 
-    private List<Section> sectionList;
     public String getTitle() {
         return title;
     }
