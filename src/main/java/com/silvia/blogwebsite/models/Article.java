@@ -1,6 +1,7 @@
 package com.silvia.blogwebsite.models;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
 
 public class Article {
@@ -9,7 +10,7 @@ public class Article {
     private String intro;
     private String coverImgUrl;
     private int headerType;     // 1, 2, 3
-    private Date date;
+    private Timestamp timestamp;
     private String category;
     private List<Section> sectionList;
 
@@ -68,29 +69,29 @@ public class Article {
         this.headerType = headerType;
     }
 
-    public Date getDate() {
-        return date;
+    public Timestamp getTimestamp() {
+        return timestamp;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setTimestamp(Timestamp timestamp) {
+        this.timestamp = timestamp;
     }
 
     public Article(){}
 
-    public Article(int id, String title, Date date, String category){    // 數據庫標記文章的數據結構
+    public Article(int id, String title, Timestamp date, String category){    // 數據庫標記文章的數據結構
         this.id = id;
         this.title = title;
-        this.date = date;
+        this.timestamp = date;
         this.category = category;
     }
 
-    public Article(String title, String intro, String coverImgUrl, int headerType, Date date, List<Section> sectionList) {
+    public Article(String title, String intro, String coverImgUrl, int headerType, Timestamp date, List<Section> sectionList) {
         this.title = title;
         this.intro = intro;
         this.coverImgUrl = coverImgUrl;
         this.headerType = headerType;
-        this.date = date;
+        this.timestamp = date;
         this.sectionList = sectionList;
     }
 }

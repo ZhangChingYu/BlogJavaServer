@@ -22,7 +22,7 @@ public class FileManager {
         File root = new File(fileRoot);
         if(root.isDirectory()){
             File file = new File(fileRoot+"/"+fileName);
-            if(file.isDirectory()){
+            if(file.mkdirs()||file.isDirectory()){
                 System.out.println(file.getAbsolutePath()+" is directory.");
                 this.root = fileRoot+"/"+fileName;
                 return true;

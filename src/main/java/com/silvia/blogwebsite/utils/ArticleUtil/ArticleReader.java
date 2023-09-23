@@ -2,17 +2,17 @@ package com.silvia.blogwebsite.utils.ArticleUtil;
 
 import com.silvia.blogwebsite.models.Article;
 import com.silvia.blogwebsite.models.Section;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ArticleReader {
     private ArticleReader(){}
-    public static Article readArticle(String filePath){
+    public static Article readArticle(String filePath, Article target){
         Article article = new Article();
         int headerType = 0;
         StringBuilder title = new StringBuilder();
@@ -88,8 +88,8 @@ public class ArticleReader {
                             }
                         }
                         section.setSectionType(getType(sectionType));
-                        section.setTitle(s_title.toString());
-                        section.setIntro(s_intro.toString());
+                        section.setTitle(StringEscapeUtils.escapeJava(s_title.toString()));
+                        section.setIntro(StringEscapeUtils.escapeJava(s_intro.toString()));
                         section.setPicList(picList);
                         sectionList.add(section);
                     }
@@ -98,10 +98,12 @@ public class ArticleReader {
         } catch (IOException e){
             System.out.println("[IO Error]:" + e);
         }
+        article.setId(target.getId());
         article.setHeaderType(headerType);
-        article.setTitle(title.toString());
-        article.setDate(new Date(2023, 8, 2));
-        article.setIntro(intro.toString());
+        article.setTimestamp(target.getTimestamp());
+        article.setCategory(target.getCategory());
+        article.setTitle(StringEscapeUtils.escapeJava(title.toString()));
+        article.setIntro(StringEscapeUtils.escapeJava(intro.toString()));
         article.setCoverImgUrl(picture);
         article.setSectionList(sectionList);
         return article;
@@ -118,10 +120,11 @@ public class ArticleReader {
         }
         return type;
     }
-
+/**
     public static void main(String[] args) {
         String filePath = "media/article/2023/08/02-id-title";
         Article article = readArticle(filePath);
         System.out.println(article.getSectionList().size());
     }
+ */
 }

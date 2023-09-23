@@ -1,5 +1,6 @@
 package com.silvia.blogwebsite;
 
+import com.silvia.blogwebsite.handlers.ArticleHandler;
 import com.silvia.blogwebsite.handlers.CategoryHandler;
 import com.silvia.blogwebsite.handlers.HelloHandler;
 import com.silvia.blogwebsite.handlers.PictureHandler;
@@ -17,6 +18,7 @@ public class BlogController {
     public BlogController(){
         handlers.put(Pattern.compile("/categories.*"), new CategoryHandler());
         handlers.put(Pattern.compile("/images.*"), new PictureHandler());
+        handlers.put(Pattern.compile("/article.*"), new ArticleHandler());
         handlers.put(Pattern.compile("/hello.*"), new HelloHandler());
     }
 

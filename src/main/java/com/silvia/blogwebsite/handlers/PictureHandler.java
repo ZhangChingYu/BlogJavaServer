@@ -1,6 +1,4 @@
 package com.silvia.blogwebsite.handlers;
-
-
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
@@ -48,21 +46,41 @@ public class PictureHandler implements HttpHandler {
                 }
             }
             case "POST" -> {
-                if(path.equals("/images/upload")){
-                    System.out.println("Image Posting...");
+                InputStream inputStream = exchange.getRequestBody();
+                String fileType = "." + exchange.getRequestHeaders().getFirst("Content-Type").split("/")[1];
+                byte[] fileBytes = inputStream.readAllBytes();
+
+                if(path.equals("/images/upload/cover")){
+                    System.out.println("Cover Image Posting...");
                     // 解析文件數據
-                    InputStream inputStream = exchange.getRequestBody();
-                    String fileName = exchange.getRequestHeaders().getFirst("Content-Disposition").replaceFirst("(?i)^.*filename=\"([^\"]+)\".*$", "$1");
-                    String fileType = "." + exchange.getRequestHeaders().getFirst("Content-Type").split("/")[1];
-                    System.out.println("[Get File Name]: " + fileName);
                     System.out.println("[Get File Type]: " + fileType);
-                    byte[] fileBytes = inputStream.readAllBytes();
 
                     // 將文件保存到目標目錄
                     String response;
-                    if(fileHandler(fileBytes, fileName+fileType)){
+                    if(fileHandler(fileBytes, "cover"+fileType)){
                         // 回傳成功響應給前端
-                        response = "File uploaded successfully!";
+                        response = "media/image/cover"+fileType;
+                        exchange.sendResponseHeaders(200, response.length());
+                    }
+                    else {
+                        // 回傳失敗響應給前端
+                        response = "File uploaded failed!";
+                        exchange.sendResponseHeaders(405, response.length());
+                    }
+                    os = exchange.getResponseBody();
+                    os.write(response.getBytes());
+                    os.close();
+                } else if (path.matches("/images/upload/section/\\d+")) {
+                    String sectionId = path.replace("/images/upload/section/", "");
+                    System.out.println("[Section Image Posting...]");
+                    System.out.println("[Get Section File Type]: " + fileType);
+
+                    // 將文件保存到目標目錄
+                    String response;
+                    String fileCount = exchange.getRequestHeaders().getFirst("Content-Disposition").replaceFirst("(?i)^.*count=\"([^\"]+)\".*$", "$1");
+                    if(fileHandler(fileBytes, fileCount+fileType, sectionId)){
+                        // 回傳成功響應給前端
+                        response = "media/image/temp/section"+sectionId+"/"+fileCount+fileType;
                         exchange.sendResponseHeaders(200, response.length());
                     }
                     else {
@@ -93,7 +111,26 @@ public class PictureHandler implements HttpHandler {
     }
     private boolean fileHandler(byte[] fileBytes, String fileName){
         // 將文件保存到目標目錄
-        Path targetDirectory = Path.of("media/image/");
+        File file = new File("media/image/temp/");
+        if(!file.isDirectory()){
+            if(file.mkdirs()){
+            }
+        }
+        Path targetDirectory = Path.of("media/image/temp/");
+        Path filePath = targetDirectory.resolve(fileName);
+        try {
+            Files.write(filePath, fileBytes);
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+    private boolean fileHandler(byte[] fileBytes, String fileName, String sectionId){
+        File file = new File("media/image/temp/section"+sectionId+"/");
+        if(!file.isDirectory()){
+            if (file.mkdirs()){}
+        }
+        Path targetDirectory = Path.of("media/image/temp/section"+sectionId+"/");
         Path filePath = targetDirectory.resolve(fileName);
         try {
             Files.write(filePath, fileBytes);

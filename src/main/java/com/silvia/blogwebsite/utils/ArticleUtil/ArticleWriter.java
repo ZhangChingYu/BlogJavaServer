@@ -7,7 +7,6 @@ import com.silvia.blogwebsite.utils.FileManager;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,14 +14,14 @@ import java.util.List;
 public class ArticleWriter {
     private final String fileRoot = "media/article";
     private final Article article;
-    private final String fileName;
+    private final int generatedId;
 
-    public ArticleWriter(Article article, String fileName) {
+    public ArticleWriter(Article article, int generatedId) {
         this.article = article;
-        this.fileName = fileName;
+        this.generatedId = generatedId;
     }
 
-    private String contentBuilder(){
+    public String contentBuilder(){
         StringBuilder content = new StringBuilder();
         // build Header
         // first build the element inside
@@ -70,6 +69,7 @@ public class ArticleWriter {
         }
         // add section part behind header part.
         content.append("\n").append(section);
+        System.out.println("[Content Created]\n"+content);
         return content.toString();
     }
 
@@ -94,7 +94,7 @@ public class ArticleWriter {
         }
     }
 
-    private static void writeToFile(String filePath, String content) throws IOException {
+    public static void writeToFile(String filePath, String content) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             writer.write(content);
         }
@@ -112,7 +112,7 @@ public class ArticleWriter {
         return typeName;
     }
 
-    private String filePathGenerator(){
+    public String filePathGenerator(){
         String path = "";
         FileManager generator = new FileManager();
         LocalDate currentDate = LocalDate.now();
@@ -122,7 +122,7 @@ public class ArticleWriter {
         String day = date[2];
         if(generator.createDirectory(fileRoot, year)){
             if(generator.createDirectory(generator.getRoot(), month)){
-                path = generator.getRoot() + "/" + day+"-"+"id"+"-"+fileName;
+                path = generator.getRoot() + "/" + day+"-"+generatedId;
             }
         }
         else {
@@ -130,7 +130,7 @@ public class ArticleWriter {
         }
         return path;
     }
-
+/**
     public static void main(String[] args) {
 
         List<String> picList = new ArrayList<>();
@@ -149,4 +149,5 @@ public class ArticleWriter {
             throw new RuntimeException(e);
         }
     }
+ **/
 }
