@@ -144,9 +144,14 @@ public class ArticleDao {
     }
 
     // 獲取標記為 Highlight 的文章
-    public List<Article> getHighLight(){
+    public List<Article> getHighLight(String theme){
+        String sql = "";
         List<Article> articleList = new ArrayList<>();
-        String sql = "SELECT * FROM " + tableName + " WHERE highlight = TRUE";
+        if(theme.equals("life")){
+            sql = "SELECT * FROM " + tableName + " WHERE highlight = 1 AND category LIKE '1|%'";
+        } else if (theme.equals("work")) {
+            sql = "SELECT * FROM " + tableName + " WHERE highlight = 1 AND category LIKE '2|%'";
+        }
         try{
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             ResultSet resultSet = preparedStatement.executeQuery();

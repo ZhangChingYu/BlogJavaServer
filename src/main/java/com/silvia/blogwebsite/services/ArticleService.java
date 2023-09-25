@@ -11,7 +11,7 @@ public interface ArticleService {
     List<ArticleHeaderDto> getArticleByKeyword(String keyword);
     ArticleHeaderDto getLatestArticle();
     ArticleDto readArticle(int id);
-    List<ArticleHeaderDto> getHighlight();
+    List<ArticleHeaderDto> getHighlight(String theme);
     List<ArticleHeaderDto> getLatest();
     void updateArticle(int id, String newContent);
     void deleteArticle(int id);

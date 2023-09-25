@@ -82,6 +82,24 @@ public class ArticleHandler implements HttpHandler {
                     os = exchange.getResponseBody();
                     os.write(jsonResponse.getBytes("UTF-8"));
                     os.close();
+                } else if (path.matches("/article/highlight/\\w+")){
+                    String theme = path.replace("/article/highlight/","");
+                    if(theme.equals("work")||theme.equals("life")){
+                        List<ArticleHeaderDto> headerList = service.getHighlight(theme);
+                        mapper = new JsonMapper();
+
+                        jsonResponse = mapper.writeValueAsString(headerList);
+                        exchange.getResponseHeaders().set("Content-Type", "application/json;charset=UTF-8");
+                        exchange.sendResponseHeaders(200, jsonResponse.length());
+                    }
+                    else {
+                        jsonResponse = "Resource Not Found";
+                        exchange.sendResponseHeaders(404, jsonResponse.length());
+                    }
+
+                    os = exchange.getResponseBody();
+                    os.write(jsonResponse.getBytes());
+                    os.close();
                 }
             }
             case "POST" -> {

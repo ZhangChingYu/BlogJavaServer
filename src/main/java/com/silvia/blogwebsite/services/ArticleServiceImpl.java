@@ -95,10 +95,13 @@ public class ArticleServiceImpl implements ArticleService{
     }
 
     @Override
-    public List<ArticleHeaderDto> getHighlight() {
+    public List<ArticleHeaderDto> getHighlight(String theme) {
         try(Connection connection = ConnectionManager.getConnection()){
             articleDao = new ArticleDao(connection);
+            List<Article> articleList = articleDao.getHighLight(theme);
+            List<ArticleHeaderDto> headerList = packArticleList(articleList);
             ConnectionManager.closeConnection();
+            return headerList;
         }catch (SQLException e){
             System.out.println("[Sql Connection Disconnected]");
         }
