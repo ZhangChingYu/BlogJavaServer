@@ -144,6 +144,33 @@ public class ArticleDao {
         return null;
     }
 
+    // 依照時間排序獲取相應 theme 的文章
+    public List<Article> getLatestArticleByTheme(String theme){
+        List<Article> articleList = new ArrayList<>();
+        String sql = "SELECT * FROM " + tableName + " WHERE category LIKE ? ORDER BY date DESC LIMIT 20";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)){
+            if(theme.equals("life")){
+                preparedStatement.setString(1, "1|%");
+            } else if (theme.equals("work")) {
+                preparedStatement.setString(1, "2|%");
+            }
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()){
+                Article article = new Article(
+                        resultSet.getInt("id"),
+                        resultSet.getString("title"),
+                        resultSet.getTimestamp("date"),
+                        resultSet.getString("category")
+                );
+                articleList.add(article);
+            }
+        } catch (SQLException e) {
+            System.out.println("[Get Latest Articles By Theme Error]: " + e);
+        }
+        return articleList;
+    }
+
     // 獲取標記為 Highlight 的文章
     public List<Article> getHighLight(String theme){
         String sql = "";
@@ -207,7 +234,7 @@ public class ArticleDao {
 
     public static void main(String[] args) throws SQLException {
         ArticleDao articleDao = new ArticleDao(ConnectionManager.getConnection());
-        int[] idList = { 18, 19, 20};
-        articleDao.updateArticleHighlight(idList, false);
+        List<Article> articleList = articleDao.getLatestArticleByTheme("work");
+        System.out.println(articleList.get(1).getTitle());
     }
 }

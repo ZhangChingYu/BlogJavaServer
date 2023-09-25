@@ -12,7 +12,7 @@ public interface ArticleService {
     ArticleHeaderDto getLatestArticle();
     ArticleDto readArticle(int id);
     List<ArticleHeaderDto> getHighlight(String theme);
-    List<ArticleHeaderDto> getLatest();
+    List<ArticleHeaderDto> getLatest(String theme);
     void setHighlight(int[] idList, boolean status);
     void updateArticle(int id, String newContent);
     void deleteArticle(int id);

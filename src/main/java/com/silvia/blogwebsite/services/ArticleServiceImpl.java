@@ -110,10 +110,13 @@ public class ArticleServiceImpl implements ArticleService{
     }
 
     @Override
-    public List<ArticleHeaderDto> getLatest() {
+    public List<ArticleHeaderDto> getLatest(String theme) {
         try(Connection connection = ConnectionManager.getConnection()){
             articleDao = new ArticleDao(connection);
+            List<Article> articleList = articleDao.getLatestArticleByTheme(theme);
+            List<ArticleHeaderDto> headerList = packArticleList(articleList);
             ConnectionManager.closeConnection();
+            return headerList;
         }catch (SQLException e){
             System.out.println("[Sql Connection Disconnected]");
         }

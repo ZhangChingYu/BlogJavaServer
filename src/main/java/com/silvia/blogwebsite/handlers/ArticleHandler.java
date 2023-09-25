@@ -97,7 +97,22 @@ public class ArticleHandler implements HttpHandler {
                         jsonResponse = "Resource Not Found";
                         exchange.sendResponseHeaders(404, jsonResponse.length());
                     }
-
+                    os = exchange.getResponseBody();
+                    os.write(jsonResponse.getBytes());
+                    os.close();
+                } else if (path.matches("/article/latest/\\w+")) {
+                    String theme = path.replace("/article/latest/", "");
+                    if(theme.equals("life") || theme.equals("work")){
+                        List<ArticleHeaderDto> headerList = service.getLatest(theme);
+                        mapper = new JsonMapper();
+                        jsonResponse = mapper.writeValueAsString(headerList);
+                        exchange.getResponseHeaders().set("Content-Type", "application/json;charset=UTF-8");
+                        exchange.sendResponseHeaders(200, jsonResponse.length());
+                    }
+                    else {
+                        jsonResponse = "Resource Not Found";
+                        exchange.sendResponseHeaders(404, jsonResponse.length());
+                    }
                     os = exchange.getResponseBody();
                     os.write(jsonResponse.getBytes());
                     os.close();
