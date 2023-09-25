@@ -13,6 +13,7 @@ public class Article {
     private Timestamp timestamp;
     private String category;
     private List<Section> sectionList;
+    private int highlight;      // 0, 1
 
     public String getCategory() {
         return category;
@@ -76,6 +77,10 @@ public class Article {
     public void setTimestamp(Timestamp timestamp) {
         this.timestamp = timestamp;
     }
+
+    public int getHighlight() { return highlight; }
+
+    public void setHighlight(int highlight) { this.highlight = highlight; }
 
     public Article(){}
 

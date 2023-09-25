@@ -5,6 +5,7 @@ import com.silvia.blogwebsite.sqlConnector.ConnectionManager;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ArticleDao {
@@ -166,6 +167,28 @@ public class ArticleDao {
         return null;
     }
 
+    // 批量設置 highlight 文章
+    public void updateArticleHighlight(int[] idList, boolean status){
+        String sql = "UPDATE " + tableName + " SET highlight = ? WHERE id IN (" +
+                String.join(",", Collections.nCopies(idList.length, "?")) + ")";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)){
+            if(status){
+                preparedStatement.setInt(1, 1);
+            }else {
+                preparedStatement.setInt(1, 0);
+            }
+            // 設置 IN 子句中的參數
+            for (int i = 0; i < idList.length; i++) {
+                preparedStatement.setInt(i + 2, idList[i]);
+            }
+            int rowUpdated = preparedStatement.executeUpdate();
+            System.out.println("[Update Article Highlight Succeed] status effected row: " + rowUpdated);
+
+        } catch (SQLException e){
+            System.out.println("[Update Article Highlight Error]: " + e);
+        }
+    }
+
     // 確認是否存在相同的標題
     public boolean checkForSameTitle(String title){
         String sql = "SELECT COUNT(*) FROM " + tableName + " WHERE title = ?";
@@ -184,7 +207,7 @@ public class ArticleDao {
 
     public static void main(String[] args) throws SQLException {
         ArticleDao articleDao = new ArticleDao(ConnectionManager.getConnection());
-        Article article = articleDao.getLatestArticle();
-        System.out.println(article.getTitle());
+        int[] idList = { 18, 19, 20};
+        articleDao.updateArticleHighlight(idList, false);
     }
 }

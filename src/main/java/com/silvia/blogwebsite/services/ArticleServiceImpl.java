@@ -120,6 +120,17 @@ public class ArticleServiceImpl implements ArticleService{
     }
 
     @Override
+    public void setHighlight(int[] idList, boolean status) {
+        try(Connection connection = ConnectionManager.getConnection()) {
+            articleDao = new ArticleDao(connection);
+            articleDao.updateArticleHighlight(idList, status);
+            ConnectionManager.closeConnection();
+        } catch (SQLException e){
+            System.out.println("[Sql Connection Disconnected]");
+        }
+    }
+
+    @Override
     public void updateArticle(int id, String newContent) {
         try(Connection connection = ConnectionManager.getConnection()){
             articleDao = new ArticleDao(connection);

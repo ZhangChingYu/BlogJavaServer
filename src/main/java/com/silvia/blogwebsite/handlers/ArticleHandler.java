@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.silvia.blogwebsite.dto.ArticleDto;
 import com.silvia.blogwebsite.dto.ArticleHeaderDto;
+import com.silvia.blogwebsite.dto.HighlightDto;
 import com.silvia.blogwebsite.models.Article;
 import com.silvia.blogwebsite.services.ArticleService;
 import com.silvia.blogwebsite.services.ArticleServiceImpl;
@@ -119,8 +120,20 @@ public class ArticleHandler implements HttpHandler {
                 }
             }
             case "PUT" -> {
-                if(path.equals("/article/update")){
+                String jsonResponse;
+                if(path.equals("/article")){
 
+                } else if (path.equals("/article/highlight")) {
+                    System.out.println("[Start Updating Article Highlight...]");
+                    mapper = new ObjectMapper();
+                    HighlightDto dto = mapper.readValue(requestBodyText, HighlightDto.class);
+                    service.setHighlight(dto.getIdList(), dto.isStatus());
+                    jsonResponse = "[Article Highlight Updated]";
+
+                    exchange.sendResponseHeaders(200, jsonResponse.length());
+                    os = exchange.getResponseBody();
+                    os.write(jsonResponse.getBytes());
+                    os.close();
                 }
             }
             case "DELETE" -> {
