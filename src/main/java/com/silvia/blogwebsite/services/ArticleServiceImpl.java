@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import java.util.List;
@@ -158,9 +159,9 @@ public class ArticleServiceImpl implements ArticleService{
         try(Connection connection = ConnectionManager.getConnection()){
             articleDao = new ArticleDao(connection);
             // 1. 將接受到的文章對象插入數據庫中，並取得 Id
-            // 獲取當前日期的 java.util.Date 對象
-            java.util.Date utilDate = new java.util.Date();
-            int generatedId = articleDao.insertArticle(article.getTitle(),new java.sql.Date(utilDate.getTime()), article.getCategory());
+            // 獲取當前時間戳
+            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+            int generatedId = articleDao.insertArticle(article.getTitle(), timestamp, article.getCategory());
             // 指定文件夾的完整路徑
             String folderPath = "media/image/";
             String currentFolderName = "temp";

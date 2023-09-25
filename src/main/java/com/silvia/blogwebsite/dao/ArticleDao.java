@@ -14,7 +14,7 @@ public class ArticleDao {
     public ArticleDao(Connection connection){
         this.connection = connection;
     }
-    public int insertArticle(String title, Date date, String category){
+    public int insertArticle(String title, Timestamp date, String category){
         if(checkForSameTitle(title)){
             System.out.println("[Insert Article Failed]: Same Title Already Exist.");
             return 0;
@@ -22,7 +22,7 @@ public class ArticleDao {
         String sql = "INSERT INTO " + tableName + " (title, date, category) VALUES (?, ?, ?)";
         try(PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)){
             preparedStatement.setString(1, title);
-            preparedStatement.setDate(2, date);
+            preparedStatement.setTimestamp(2, date);
             preparedStatement.setString(3, category);
             int affectedRows = preparedStatement.executeUpdate();
             if(affectedRows > 0){
