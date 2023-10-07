@@ -135,9 +135,14 @@ public class ArticleServiceImpl implements ArticleService{
     }
 
     @Override
-    public void updateArticle(int id, String newContent) {
+    public void updateArticle(int id, Article newContent) {
         try(Connection connection = ConnectionManager.getConnection()){
             articleDao = new ArticleDao(connection);
+            Article article = articleDao.getById(id);
+            ArticleDate date = new ArticleDate(article.getTimestamp().toString());
+            String filename = date.day+"-"+article.getId();
+            String filepath = "media/article/" + date.year + "/" + date.month + "/" + filename;
+            Article oldContent = ArticleReader.readArticle(filepath, article);
             ConnectionManager.closeConnection();
         }catch (SQLException e){
             System.out.println("[Sql Connection Disconnected]");
