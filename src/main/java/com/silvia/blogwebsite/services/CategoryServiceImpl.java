@@ -32,13 +32,13 @@ public class CategoryServiceImpl implements CategoryService{
     }
 
     @Override
-    public int addCategory(int themeId, String name) {
-        return categoryDao.insertCategory(themeId, name);
+    public int addCategory(int themeId, String name, String intro) {
+        return categoryDao.insertCategory(themeId, name, intro);
     }
 
     @Override
-    public Category updateCategory(int id, String newName) {
-        categoryDao.updateCategory(id, newName);
+    public Category updateCategory(int id, String newName, String newIntro) {
+        categoryDao.updateCategory(id, newName, newIntro);
         return getCategoryById(id);
     }
 

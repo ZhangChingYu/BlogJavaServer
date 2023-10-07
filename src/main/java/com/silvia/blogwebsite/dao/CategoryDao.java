@@ -13,12 +13,13 @@ public class CategoryDao {
         this.connection = connection;
     }
 
-    public int insertCategory(int root, String name){
-        String sql = "INSERT INTO "+tableName+" (root, name) VALUES (?, ?)";
+    public int insertCategory(int root, String name, String intro){
+        String sql = "INSERT INTO "+tableName+" (root, name, intro) VALUES (?, ?, ?)";
         int generatedId = 0;
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)){
             preparedStatement.setInt(1, root);
             preparedStatement.setString(2, name);
+            preparedStatement.setString(3, intro);
             int affectedRows = preparedStatement.executeUpdate();
             if (affectedRows > 0) {
                 try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
@@ -43,7 +44,8 @@ public class CategoryDao {
                 int id = resultSet.getInt("id");
                 int root = resultSet.getInt("root");
                 String name = resultSet.getString("name");
-                categories.add(new Category(id, root, name));
+                String intro = resultSet.getString("intro");
+                categories.add(new Category(id, root, name, intro));
             }
         }catch (SQLException e){
             System.out.println("Get All Category Error! " + e);
@@ -60,7 +62,8 @@ public class CategoryDao {
             while (resultSet.next()){
                 int id = resultSet.getInt("id");
                 String name = resultSet.getString("name");
-                categories.add(new Category(id, root, name));
+                String intro = resultSet.getString("intro");
+                categories.add(new Category(id, root, name, intro));
             }
         } catch (SQLException e){
             System.out.println("[Get Category By Root Error]: Result Set " + e);
@@ -76,7 +79,8 @@ public class CategoryDao {
                 if(resultSet.next()){
                     int root = resultSet.getInt("root");
                     String name = resultSet.getString("name");
-                    return new Category(id, root, name);
+                    String intro = resultSet.getString("intro");
+                    return new Category(id, root, name, intro);
                 }
             } catch (SQLException e){
                 System.out.println("[Get Category By Id Error]: Result Set " + e);
@@ -87,11 +91,12 @@ public class CategoryDao {
         return null;
     }
 
-    public void updateCategory(int id, String newName){
-        String sql = "UPDATE " + tableName + " SET name = ? WHERE id = ?";
+    public void updateCategory(int id, String newName, String newIntro){
+        String sql = "UPDATE " + tableName + " SET name = ?, intro = ? WHERE id = ?";
         try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, newName);
-            preparedStatement.setInt(2, id);
+            preparedStatement.setString(2, newIntro);
+            preparedStatement.setInt(3, id);
             int result = preparedStatement.executeUpdate();
             System.out.println("[Update Category Succeed] status code: " + result);
         } catch (SQLException e){

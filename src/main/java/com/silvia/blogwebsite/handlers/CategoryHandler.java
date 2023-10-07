@@ -33,6 +33,7 @@ public class CategoryHandler implements HttpHandler {
                     jsonResponse = mapper.writeValueAsString(categories);
 
                     exchange.getResponseHeaders().set("Content-Type", "application/json");
+                    exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
                     exchange.sendResponseHeaders(200, jsonResponse.length());
                     os = exchange.getResponseBody();
                     os.write(jsonResponse.getBytes());
@@ -61,7 +62,7 @@ public class CategoryHandler implements HttpHandler {
                     mapper = new ObjectMapper();
                     Category category = mapper.readValue(requestBodyText, Category.class);
                     // 插入Category
-                    int generatedId = service.addCategory(category.getRoot(), category.getName());
+                    int generatedId = service.addCategory(category.getRoot(), category.getName(), category.getIntro());
 
                     String jsonResponse = "[Category Inserted]: id="+generatedId+", name="+category.getName()+", root="+category.getRoot();
                     exchange.sendResponseHeaders(200, jsonResponse.length());
@@ -77,7 +78,7 @@ public class CategoryHandler implements HttpHandler {
                     mapper = new ObjectMapper();
                     Category category = mapper.readValue(requestBodyText, Category.class);
                     // 更新Category
-                    Category newCategory = service.updateCategory(category.getId(), category.getName());
+                    Category newCategory = service.updateCategory(category.getId(), category.getName(), category.getIntro());
 
                     String jsonResponse = "[Category Updated]: name="+newCategory.getName()+", id="+newCategory.getId() + ", root="+newCategory.getRoot();
                     exchange.sendResponseHeaders(200, jsonResponse.length());
