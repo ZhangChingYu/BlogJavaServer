@@ -4,6 +4,7 @@ import com.silvia.blogwebsite.dao.ArticleDao;
 import com.silvia.blogwebsite.dao.CategoryDao;
 import com.silvia.blogwebsite.dto.ArticleDto;
 import com.silvia.blogwebsite.dto.ArticleHeaderDto;
+import com.silvia.blogwebsite.dto.CategoryDto;
 import com.silvia.blogwebsite.models.Article;
 import com.silvia.blogwebsite.models.Category;
 import com.silvia.blogwebsite.models.Section;
@@ -39,12 +40,12 @@ public class ArticleServiceImpl implements ArticleService{
             // 構建 category list
             categoryDao = new CategoryDao(connection);
             String[] cateIdList = target.getCategory().split("\\|");
-            List<String> categories = new ArrayList<>();
+            List<CategoryDto> categoryList = new ArrayList<>();
             for(String cateId : cateIdList){
                 Category category = categoryDao.getCategoryById(Integer.parseInt(cateId));
-                categories.add(category.getName());
+                categoryList.add(new CategoryDto(category.getId(), category.getName()));
             }
-            dto.setCategories(categories);
+            dto.setCategoryList(categoryList);
             connection.close();
             return dto;
         }
@@ -54,10 +55,10 @@ public class ArticleServiceImpl implements ArticleService{
         return null;
     }
     @Override
-    public List<ArticleHeaderDto> getArticleByCategory(int cateId) {
+    public List<ArticleHeaderDto> getArticleByCategory(int cateId, int start, int size) {
         try(Connection connection = ConnectionManager.getConnection()){
             articleDao = new ArticleDao(connection);
-            List<Article> articleList = articleDao.getByCategory(cateId);
+            List<Article> articleList = articleDao.getByCategory(cateId, start, size);
             List<ArticleHeaderDto> headerList = packArticleList(articleList);
             ConnectionManager.closeConnection();
             return headerList;
@@ -68,10 +69,10 @@ public class ArticleServiceImpl implements ArticleService{
     }
 
     @Override
-    public List<ArticleHeaderDto> getArticleByKeyword(String keyword) {
+    public List<ArticleHeaderDto> getArticleByKeyword(String keyword, int start, int size) {
         try(Connection connection = ConnectionManager.getConnection()){
             articleDao = new ArticleDao(connection);
-            List<Article> articleList = articleDao.getByKeyword(keyword);
+            List<Article> articleList = articleDao.getByKeyword(keyword, start, size);
             List<ArticleHeaderDto> headerList = packArticleList(articleList);
             ConnectionManager.closeConnection();
             return headerList;
@@ -96,10 +97,10 @@ public class ArticleServiceImpl implements ArticleService{
     }
 
     @Override
-    public List<ArticleHeaderDto> getHighlight(String theme) {
+    public List<ArticleHeaderDto> getHighlight(int themeId, int start, int size) {
         try(Connection connection = ConnectionManager.getConnection()){
             articleDao = new ArticleDao(connection);
-            List<Article> articleList = articleDao.getHighLight(theme);
+            List<Article> articleList = articleDao.getHighLight(themeId, start, size);
             List<ArticleHeaderDto> headerList = packArticleList(articleList);
             ConnectionManager.closeConnection();
             return headerList;
@@ -110,10 +111,10 @@ public class ArticleServiceImpl implements ArticleService{
     }
 
     @Override
-    public List<ArticleHeaderDto> getLatest(String theme) {
+    public List<ArticleHeaderDto> getLatest(int themeId, int start, int size) {
         try(Connection connection = ConnectionManager.getConnection()){
             articleDao = new ArticleDao(connection);
-            List<Article> articleList = articleDao.getLatestArticleByTheme(theme);
+            List<Article> articleList = articleDao.getLatestArticleByTheme(themeId, start, size);
             List<ArticleHeaderDto> headerList = packArticleList(articleList);
             ConnectionManager.closeConnection();
             return headerList;
@@ -121,6 +122,78 @@ public class ArticleServiceImpl implements ArticleService{
             System.out.println("[Sql Connection Disconnected]");
         }
         return null;
+    }
+
+    @Override
+    public List<ArticleHeaderDto> getHighlight3(String theme) {
+        try(Connection connection = ConnectionManager.getConnection()){
+            articleDao = new ArticleDao(connection);
+            List<Article> articleList = articleDao.getHighLight3(theme);
+            List<ArticleHeaderDto> headerList = packArticleList(articleList);
+            ConnectionManager.closeConnection();
+            return headerList;
+        }catch (SQLException e){
+            System.out.println("[Sql Connection Disconnected]");
+        }
+        return null;
+    }
+
+    @Override
+    public List<ArticleHeaderDto> getLatest3(String theme) {
+        try(Connection connection = ConnectionManager.getConnection()){
+            articleDao = new ArticleDao(connection);
+            List<Article> articleList = articleDao.getLatestArticleByTheme3(theme);
+            List<ArticleHeaderDto> headerList = packArticleList(articleList);
+            ConnectionManager.closeConnection();
+            return headerList;
+        }catch (SQLException e){
+            System.out.println("[Sql Connection Disconnected]");
+        }
+        return null;
+    }
+
+    @Override
+    public int getRequestDataCount(String type, String conditions) {
+        switch (type){
+            case "cateId":
+                int cateId = Integer.parseInt(conditions);
+                try (Connection connection = ConnectionManager.getConnection()){
+                    articleDao = new ArticleDao(connection);
+                    int count = articleDao.getByCategoryTotalSize(cateId);
+                    return count;
+                }catch (SQLException e){
+                    System.out.println("[Sql Connection Disconnected]\n"+e);
+                }
+                break;
+            case "latest":
+                try (Connection connection = ConnectionManager.getConnection()){
+                    articleDao = new ArticleDao(connection);
+                    int count = articleDao.getArticleSize(conditions);
+                    return count;
+                }catch (SQLException e){
+                    System.out.println("[Sql Connection Disconnected]\n"+e);
+                }
+                break;
+            case "highlight":
+                try (Connection connection = ConnectionManager.getConnection()){
+                    articleDao = new ArticleDao(connection);
+                    int count = articleDao.getArticleHighlightSize(conditions);
+                    return count;
+                }catch (SQLException e){
+                    System.out.println("[Sql Connection Disconnected]\n"+e);
+                }
+                break;
+            case "search":
+                try (Connection connection = ConnectionManager.getConnection()){
+                    articleDao = new ArticleDao(connection);
+                    int count = articleDao.getByKeyword(conditions);
+                    return count;
+                }catch (SQLException e){
+                    System.out.println("[Sql Connection Disconnected]\n"+e);
+                }
+                break;
+        }
+        return 0;
     }
 
     @Override
@@ -287,8 +360,23 @@ public class ArticleServiceImpl implements ArticleService{
                     element.getTimestamp().toString(),
                     element.getTitle(),
                     element.getIntro(),
+                    null,
                     element.getCoverImgUrl()
             );
+            try (Connection connection = ConnectionManager.getConnection()){
+                // 構建 category list
+                categoryDao = new CategoryDao(connection);
+                String[] cateIdList = article.getCategory().split("\\|");
+                List<CategoryDto> categoryList = new ArrayList<>();
+                for(String cateId : cateIdList){
+                    Category category = categoryDao.getCategoryById(Integer.parseInt(cateId));
+                    categoryList.add(new CategoryDto(category.getId(), category.getName()));
+                }
+                header.setCategoryList(categoryList);
+                ConnectionManager.closeConnection();
+            }catch (SQLException e){
+                System.out.println("[Get Category Error]: Cannot find article category.\n"+e);
+            }
             headerList.add(header);
         }
         return headerList;
@@ -304,8 +392,23 @@ public class ArticleServiceImpl implements ArticleService{
                 element.getTimestamp().toString(),
                 element.getTitle(),
                 element.getIntro(),
+                null,
                 element.getCoverImgUrl()
         );
+        try(Connection connection = ConnectionManager.getConnection()){
+            // 構建 category list
+            categoryDao = new CategoryDao(connection);
+            String[] cateIdList = article.getCategory().split("\\|");
+            List<CategoryDto> categoryList = new ArrayList<>();
+            for(String cateId : cateIdList){
+                Category category = categoryDao.getCategoryById(Integer.parseInt(cateId));
+                categoryList.add(new CategoryDto(category.getId(), category.getName()));
+            }
+            header.setCategoryList(categoryList);
+            ConnectionManager.closeConnection();
+        }catch (SQLException e){
+            System.out.println("[Get Category Error]: Cannot find article category.\n"+e);
+        }
         return header;
     }
 

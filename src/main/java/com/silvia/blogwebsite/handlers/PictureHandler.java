@@ -1,4 +1,5 @@
 package com.silvia.blogwebsite.handlers;
+import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
@@ -49,7 +50,6 @@ public class PictureHandler implements HttpHandler {
                 InputStream inputStream = exchange.getRequestBody();
                 String fileType = "." + exchange.getRequestHeaders().getFirst("Content-Type").split("/")[1];
                 byte[] fileBytes = inputStream.readAllBytes();
-
                 if(path.equals("/images/upload/cover")){
                     System.out.println("Cover Image Posting...");
                     // 解析文件數據
@@ -70,14 +70,16 @@ public class PictureHandler implements HttpHandler {
                     os = exchange.getResponseBody();
                     os.write(response.getBytes());
                     os.close();
-                } else if (path.matches("/images/upload/section/\\d+")) {
-                    String sectionId = path.replace("/images/upload/section/", "");
+                } else if (path.matches("/images/upload/section/.*")) {
+                    String nums = path.replace("/images/upload/section/", "");
                     System.out.println("[Section Image Posting...]");
                     System.out.println("[Get Section File Type]: " + fileType);
-
+                    String[] num = nums.split("/");
+                    String sectionId = num[0];
+                    String fileCount = num[1];
                     // 將文件保存到目標目錄
                     String response;
-                    String fileCount = exchange.getRequestHeaders().getFirst("Content-Disposition").replaceFirst("(?i)^.*count=\"([^\"]+)\".*$", "$1");
+                    //String fileCount = exchange.getRequestHeaders().getFirst("Content-Disposition").replaceFirst("(?i)^.*count=\"([^\"]+)\".*$", "$1");
                     if(fileHandler(fileBytes, fileCount+fileType, sectionId)){
                         // 回傳成功響應給前端
                         response = "media/image/temp/section"+sectionId+"/"+fileCount+fileType;

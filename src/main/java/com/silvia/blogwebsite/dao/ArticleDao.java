@@ -55,13 +55,15 @@ public class ArticleDao {
         return articleList;
     }
 
-    public List<Article> getByCategory(int categoryId){
+    public List<Article> getByCategory(int categoryId, int start, int size){
         List<Article> articleList = new ArrayList<>();
-        String sql = "SELECT * FROM " + tableName + " WHERE category LIKE ? OR category LIKE ? OR category LIKE ?";
+        String sql = "SELECT * FROM " + tableName + " WHERE category LIKE ? OR category LIKE ? OR category LIKE ? ORDER BY date DESC LIMIT ?,?";
         try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, "%|" + categoryId + "|%");
             preparedStatement.setString(2, categoryId + "|%");
             preparedStatement.setString(3, "%|" + categoryId);
+            preparedStatement.setInt(4, start);
+            preparedStatement.setInt(5, size);
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()){
                 Article article = new Article(resultSet.getInt("id"), resultSet.getString("title"), resultSet.getTimestamp("date"), resultSet.getString("category"));
@@ -71,6 +73,67 @@ public class ArticleDao {
             System.out.println("[Get Article By Category Error]" + e);
         }
         return articleList;
+    }
+
+    public int getByCategoryTotalSize(int categoryId){
+        String sql = "SELECT COUNT(*) FROM " + tableName + " WHERE category LIKE ? OR category LIKE ? OR category LIKE ?";
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, "%|" + categoryId + "|%");
+            preparedStatement.setString(2, categoryId + "|%");
+            preparedStatement.setString(3, "%|" + categoryId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if(resultSet.next()){
+                int count = resultSet.getInt(1);
+                return count;
+            }
+        } catch (SQLException e){
+            System.out.println("[Get Article By Category Error]" + e);
+        }
+        return 0;
+    }
+
+    public int getArticleHighlightSize(String themeId){
+        String sql = "SELECT COUNT(*) FROM " + tableName + " WHERE highlight = 1 AND category LIKE ?";
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, themeId+"|%");
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if(resultSet.next()){
+                int count = resultSet.getInt(1);
+                return count;
+            }
+        } catch (SQLException e){
+            System.out.println("[Get Article Total Size Error]" + e);
+        }
+        return 0;
+    }
+
+    public int getArticleSize(String themeId){
+        String sql = "SELECT COUNT(*) FROM " + tableName + " WHERE category LIKE ?";
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, themeId+"|%");
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if(resultSet.next()){
+                int count = resultSet.getInt(1);
+                return count;
+            }
+        } catch (SQLException e){
+            System.out.println("[Get Article Total Size Error]" + e);
+        }
+        return 0;
+    }
+
+    public int getByKeyword(String keyword){
+        String sql = "SELECT COUNT(*) FROM " + tableName + " WHERE title LIKE '%" + keyword + "%' ORDER BY date DESC";
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()){
+                int count = resultSet.getInt(1);
+                return count;
+            }
+        } catch (SQLException e){
+            System.out.println("[Get Article By Keyword Error]: " + e);
+        }
+        return 0;
     }
 
     public Article getById(int id){
@@ -112,11 +175,12 @@ public class ArticleDao {
         return article;
     }
 
-    public List<Article> getByKeyword(String keyword){
+    public List<Article> getByKeyword(String keyword, int start, int size){
         List<Article> articleList = new ArrayList<>();
-        String sql = "SELECT * FROM " + tableName + " WHERE title LIKE '%" + keyword + "%'";
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        String sql = "SELECT * FROM " + tableName + " WHERE title LIKE '%" + keyword + "%' ORDER BY date DESC LIMIT ?, ?";
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, start);
+            preparedStatement.setInt(2, size);
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()){
                 Article article = new Article(resultSet.getInt("id"), resultSet.getString("title"), resultSet.getTimestamp("date"), resultSet.getString("category"));
@@ -145,9 +209,33 @@ public class ArticleDao {
     }
 
     // 依照時間排序獲取相應 theme 的文章
-    public List<Article> getLatestArticleByTheme(String theme){
+    public List<Article> getLatestArticleByTheme(int themeId, int start, int size){
         List<Article> articleList = new ArrayList<>();
-        String sql = "SELECT * FROM " + tableName + " WHERE category LIKE ? ORDER BY date DESC LIMIT 20";
+        String sql = "SELECT * FROM " + tableName + " WHERE category LIKE ? ORDER BY date DESC LIMIT ?, ?";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)){
+            preparedStatement.setString(1, themeId+"|%");
+            preparedStatement.setInt(2, start);
+            preparedStatement.setInt(3, size);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()){
+                Article article = new Article(
+                        resultSet.getInt("id"),
+                        resultSet.getString("title"),
+                        resultSet.getTimestamp("date"),
+                        resultSet.getString("category")
+                );
+                articleList.add(article);
+            }
+        } catch (SQLException e) {
+            System.out.println("[Get Latest Articles By Theme Error]: " + e);
+        }
+        return articleList;
+    }
+
+    public List<Article> getLatestArticleByTheme3(String theme){
+        List<Article> articleList = new ArrayList<>();
+        String sql = "SELECT * FROM " + tableName + " WHERE category LIKE ? ORDER BY date DESC LIMIT 3";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)){
             if(theme.equals("life")){
@@ -172,13 +260,33 @@ public class ArticleDao {
     }
 
     // 獲取標記為 Highlight 的文章
-    public List<Article> getHighLight(String theme){
+    public List<Article> getHighLight(int themeId, int start, int size){
+        String sql = "";
+        List<Article> articleList = new ArrayList<>();
+        sql = "SELECT * FROM " + tableName + " WHERE highlight = 1 AND category LIKE ? ORDER BY date DESC LIMIT ?, ?";
+        try{
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, themeId+"|%");
+            preparedStatement.setInt(2, start);
+            preparedStatement.setInt(3, size);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()){
+                Article article = new Article(resultSet.getInt("id"), resultSet.getString("title"), resultSet.getTimestamp("date"), resultSet.getString("category"));
+                articleList.add(article);
+            }
+            return articleList;
+        }catch (SQLException e) {
+            System.out.println("[Get Highlight Article Error]: " + e);
+        }
+        return null;
+    }
+    public List<Article> getHighLight3(String theme){
         String sql = "";
         List<Article> articleList = new ArrayList<>();
         if(theme.equals("life")){
-            sql = "SELECT * FROM " + tableName + " WHERE highlight = 1 AND category LIKE '1|%'";
+            sql = "SELECT * FROM " + tableName + " WHERE highlight = 1 AND category LIKE '1|%' ORDER BY date DESC LIMIT 3";
         } else if (theme.equals("work")) {
-            sql = "SELECT * FROM " + tableName + " WHERE highlight = 1 AND category LIKE '2|%'";
+            sql = "SELECT * FROM " + tableName + " WHERE highlight = 1 AND category LIKE '2|%' ORDER BY date DESC LIMIT 3";
         }
         try{
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -217,24 +325,18 @@ public class ArticleDao {
     }
 
     // 確認是否存在相同的標題
-    public boolean checkForSameTitle(String title){
+    public boolean checkForSameTitle(String title) {
         String sql = "SELECT COUNT(*) FROM " + tableName + " WHERE title = ?";
-        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)){
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, title);
             ResultSet resultSet = preparedStatement.executeQuery();
-            if(resultSet.next()){
+            if (resultSet.next()) {
                 int count = resultSet.getInt(1);
                 return count > 0;
             }
-        }catch (SQLException e){
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         return false;
-    }
-
-    public static void main(String[] args) throws SQLException {
-        ArticleDao articleDao = new ArticleDao(ConnectionManager.getConnection());
-        List<Article> articleList = articleDao.getLatestArticleByTheme("work");
-        System.out.println(articleList.get(1).getTitle());
     }
 }

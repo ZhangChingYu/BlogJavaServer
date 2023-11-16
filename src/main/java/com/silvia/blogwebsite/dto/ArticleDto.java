@@ -12,7 +12,7 @@ public class ArticleDto {
     private String coverImgUrl;
     private int headerType;     // 1, 2, 3
     private String date;
-    private List<String> categories;
+    private List<CategoryDto> categoryList;
     private List<Section> sectionList;
 
     public ArticleDto(Article article) {
@@ -24,9 +24,15 @@ public class ArticleDto {
         this.date = article.getTimestamp().toString();
         this.sectionList = article.getSectionList();
     }
-    public void setCategories(List<String> categories){
-        this.categories = categories;
+
+    public List<CategoryDto> getCategoryList() {
+        return categoryList;
     }
+
+    public void setCategoryList(List<CategoryDto> categoryList) {
+        this.categoryList = categoryList;
+    }
+
     public int getId() {
         return id;
     }
@@ -49,10 +55,6 @@ public class ArticleDto {
 
     public String getDate() {
         return date;
-    }
-
-    public List<String> getCategories() {
-        return categories;
     }
 
     public List<Section> getSectionList() {

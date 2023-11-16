@@ -1,6 +1,7 @@
 package com.silvia.blogwebsite.dao;
 
 import com.silvia.blogwebsite.models.Category;
+import com.silvia.blogwebsite.sqlConnector.ConnectionManager;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -135,4 +136,13 @@ public class CategoryDao {
             System.out.println("[Delete Category Error]: " + e);
         }
     }
+
+    public static void main(String[] args) throws SQLException {
+        CategoryDao dao = new CategoryDao(ConnectionManager.getConnection());
+        List<Category> categories = dao.getAllCategory();
+        for(Category category:categories){
+            System.out.println(category.getIntro());
+        }
+    }
 }
+

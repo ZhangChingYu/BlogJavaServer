@@ -23,6 +23,7 @@ public class CategoryHandler implements HttpHandler {
         InputStream requestBody = exchange.getRequestBody();
         String requestBodyText = new String(requestBody.readAllBytes());
         ObjectMapper mapper;
+        System.out.println(path+" : "+method);
         switch (method) {
             case "GET" -> {
                 String jsonResponse;
@@ -31,9 +32,7 @@ public class CategoryHandler implements HttpHandler {
                     List<Category> categories = service.getAllCategory();
                     mapper = new JsonMapper();
                     jsonResponse = mapper.writeValueAsString(categories);
-
                     exchange.getResponseHeaders().set("Content-Type", "application/json");
-                    exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
                     exchange.sendResponseHeaders(200, jsonResponse.length());
                     os = exchange.getResponseBody();
                     os.write(jsonResponse.getBytes());
@@ -44,23 +43,28 @@ public class CategoryHandler implements HttpHandler {
                     Matcher matcher = pattern.matcher(path);
                     if (matcher.matches()) {
                         String numericPart = matcher.group(1); // 獲取捕獲組中的內容
+                        System.out.println("[Get Categories By Theme]: theme Id = "+Integer.parseInt(numericPart));
                         List<Category> categories = service.getCategoryByTheme(Integer.parseInt(numericPart));
                         mapper = new JsonMapper();
-                        jsonResponse = mapper.writeValueAsString(categories);
 
+                        jsonResponse = mapper.writeValueAsString(categories);
                         exchange.getResponseHeaders().set("Content-Type", "application/json");
                         exchange.sendResponseHeaders(200, jsonResponse.length());
                         os = exchange.getResponseBody();
                         os.write(jsonResponse.getBytes());
+                        os.close();
                     }
-                    os.close();
                 }
+                break;
             }
             case "POST" -> {
                 if (path.equals("/categories")) {
+                    System.out.println("get request");
+                    System.out.println(requestBodyText);
                     // 解析 POST 請求的 JSON 數據，執行創建新分類的操作
                     mapper = new ObjectMapper();
                     Category category = mapper.readValue(requestBodyText, Category.class);
+
                     // 插入Category
                     int generatedId = service.addCategory(category.getRoot(), category.getName(), category.getIntro());
 
@@ -71,6 +75,7 @@ public class CategoryHandler implements HttpHandler {
                     requestBody.close();
                 }
                 os.close();
+                break;
             }
             case "PUT" -> {
                 if (path.matches("/categories")) {
@@ -87,25 +92,29 @@ public class CategoryHandler implements HttpHandler {
                     requestBody.close();
                 }
                 os.close();
+                break;
             }
             case "DELETE" -> {
                 if (path.matches("/categories/\\d+")) {
                     // 解析 URI 中的 ID，執行刪除操作
                     Pattern pattern = Pattern.compile("/categories/(\\d+)");
                     Matcher matcher = pattern.matcher(path);
-                    if(matcher.matches()){
+                    if (matcher.matches()) {
                         String numericPart = matcher.group(1);
                         service.deleteCategory(Integer.parseInt(numericPart));
 
                         String jsonResponse = "[Category Deleted]: id=" + numericPart;
+                        exchange.getResponseHeaders().set("Content-Type", "application/json");
                         exchange.sendResponseHeaders(200, jsonResponse.length());
                         os = exchange.getResponseBody();
                         os.write(jsonResponse.getBytes());
+                        os.close();
+                        requestBody.close();
                     }
-                    os.close();
                 }
+                break;
             }
-            default ->{}
+            default ->{break;}
         }
     }
 }

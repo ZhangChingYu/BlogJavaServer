@@ -45,17 +45,23 @@ public class ArticleHandler implements HttpHandler {
                     os = exchange.getResponseBody();
                     os.write(jsonResponse.getBytes("UTF-8"));
                     os.close();
-                } else if (path.matches("/article/category/\\d+")) {
+                } else if (path.matches("/article/category/.*")) {
                     System.out.println("[Get Article By Category Starting...]");
-                    int categoryId = Integer.parseInt(path.replace("/article/category/",""));
-                    System.out.println("[Getting Category Id]: " + categoryId);
-                    List<ArticleHeaderDto> articleList =  service.getArticleByCategory(categoryId);
-                    System.out.println("[Get Articles Size]: " + articleList.size());
+                    String[] requests = path.replace("/article/category/","").split("/");
+                    int categoryId = Integer.parseInt(requests[0]);
+                    int start = Integer.parseInt(requests[1]);        // where the data start
+                    int size = Integer.parseInt(requests[2]);         // the size of the returned data, if the size=-1, than return all.
+                    System.out.println("[Getting Category Id: " + categoryId + " | Requested Size: " +size + " | Start From No." + start+"]");
+                    List<ArticleHeaderDto> articleList =  service.getArticleByCategory(categoryId, start, size);
+                    int count = service.getRequestDataCount("cateId", ""+categoryId);
+                    System.out.println("[Get Articles Size: " + articleList.size() + " | Total Size: " +count+"]");
                     mapper = new JsonMapper();
 
                     jsonResponse = mapper.writeValueAsString(articleList);
                     System.out.println(jsonResponse);
                     exchange.getResponseHeaders().set("Content-Type", "application/json;charset=UTF-8");
+                    exchange.getResponseHeaders().set("Total-Count", count+"");
+                    exchange.getResponseHeaders().set("Access-Control-Expose-Headers", "Total-Count"); // 添加這一行前端就可以讀取Header中Total-Count的信息
                     exchange.sendResponseHeaders(200, jsonResponse.length());
                     os = exchange.getResponseBody();
                     os.write(jsonResponse.getBytes("UTF-8"));
@@ -64,11 +70,15 @@ public class ArticleHandler implements HttpHandler {
                     // 獲取請求報文中的參數
                     Map<String, String> params = parseQueryParameters(exchange.getRequestURI().getQuery());
                     String keyword = params.get("keyword");
-                    List<ArticleHeaderDto> headerList = service.getArticleByKeyword(keyword);
+                    int start = Integer.parseInt(params.get("start"));
+                    int size = Integer.parseInt(params.get("size"));
+                    List<ArticleHeaderDto> headerList = service.getArticleByKeyword(keyword, start, size);
                     mapper = new JsonMapper();
                     jsonResponse = mapper.writeValueAsString(headerList);
-
+                    int count = service.getRequestDataCount("search", keyword);
                     exchange.getResponseHeaders().set("Content-Type", "application/json;charset=UTF-8");
+                    exchange.getResponseHeaders().set("Total-Count", count+"");
+                    exchange.getResponseHeaders().set("Access-Control-Expose-Headers", "Total-Count"); // 添加這一行前端就可以讀取Header中Total-Count的信息
                     exchange.sendResponseHeaders(200, jsonResponse.length());
                     os = exchange.getResponseBody();
                     os.write(jsonResponse.getBytes("UTF-8"));
@@ -83,10 +93,11 @@ public class ArticleHandler implements HttpHandler {
                     os = exchange.getResponseBody();
                     os.write(jsonResponse.getBytes("UTF-8"));
                     os.close();
-                } else if (path.matches("/article/highlight/\\w+")){
-                    String theme = path.replace("/article/highlight/","");
+                } else if (path.matches("/article/3/highlight/\\w+")) {
+                    String theme = path.replace("/article/3/highlight/","");
+                    System.out.println("[Get Highlight Top 3 "+theme+" Article Starting...]");
                     if(theme.equals("work")||theme.equals("life")){
-                        List<ArticleHeaderDto> headerList = service.getHighlight(theme);
+                        List<ArticleHeaderDto> headerList = service.getHighlight3(theme);
                         mapper = new JsonMapper();
 
                         jsonResponse = mapper.writeValueAsString(headerList);
@@ -100,10 +111,32 @@ public class ArticleHandler implements HttpHandler {
                     os = exchange.getResponseBody();
                     os.write(jsonResponse.getBytes());
                     os.close();
-                } else if (path.matches("/article/latest/\\w+")) {
-                    String theme = path.replace("/article/latest/", "");
+                } else if (path.matches("/article/highlight/.*")) {    // : /article/latest/themeId/start/size
+                    System.out.println("[Get 9 of the Highlight Article Starting...]");
+                    String[] requests = path.replace("/article/highlight/","").split("/");
+                    int themeId = Integer.parseInt(requests[0]);      // get the theme: life(1) or work(2)
+                    int start = Integer.parseInt(requests[1]);        // where the data start
+                    int size = Integer.parseInt(requests[2]);         // the size of the returned data, if the size=-1, than return all.
+                    System.out.println("[Getting Theme Id: " + themeId + " | Requested Size: " +size + " | Start From No." + start+"]");
+                    List<ArticleHeaderDto> articleList =  service.getHighlight(themeId, start, size);
+                    int count = service.getRequestDataCount("highlight", requests[0]);
+                    mapper = new JsonMapper();
+
+                    System.out.println("[Get Articles Size: " + articleList.size() + " | Total Size: " +count+"]");
+                    jsonResponse = mapper.writeValueAsString(articleList);
+                    System.out.println(jsonResponse);
+                    exchange.getResponseHeaders().set("Content-Type", "application/json;charset=UTF-8");
+                    exchange.getResponseHeaders().set("Total-Count", count+"");
+                    exchange.getResponseHeaders().set("Access-Control-Expose-Headers", "Total-Count"); // 添加這一行前端就可以讀取Header中Total-Count的信息
+                    exchange.sendResponseHeaders(200, jsonResponse.length());
+                    os = exchange.getResponseBody();
+                    os.write(jsonResponse.getBytes("UTF-8"));
+                    os.close();
+                }else if (path.matches("/article/3/latest/\\w+")) {
+                    String theme = path.replace("/article/3/latest/", "");
+                    System.out.println("[Get Latest Top 3 "+theme+" Article Starting...]");
                     if(theme.equals("life") || theme.equals("work")){
-                        List<ArticleHeaderDto> headerList = service.getLatest(theme);
+                        List<ArticleHeaderDto> headerList = service.getLatest3(theme);
                         mapper = new JsonMapper();
                         jsonResponse = mapper.writeValueAsString(headerList);
                         exchange.getResponseHeaders().set("Content-Type", "application/json;charset=UTF-8");
@@ -116,7 +149,30 @@ public class ArticleHandler implements HttpHandler {
                     os = exchange.getResponseBody();
                     os.write(jsonResponse.getBytes());
                     os.close();
+                } else if (path.matches("/article/latest/.*")) {    // : /article/latest/themeId/start/size
+                    System.out.println("[Get 9 of the Latest Article Starting...]");
+                    String[] requests = path.replace("/article/latest/","").split("/");
+                    int themeId = Integer.parseInt(requests[0]);      // get the theme: life(1) or work(2)
+                    int start = Integer.parseInt(requests[1]);        // where the data start
+                    int size = Integer.parseInt(requests[2]);         // the size of the returned data, if the size=-1, than return all.
+                    System.out.println("[Getting Theme Id: " + themeId + " | Requested Size: " +size + " | Start From No." + start+"]");
+                    List<ArticleHeaderDto> articleList =  service.getLatest(themeId, start, size);
+                    System.out.println("dddd");
+                    int count = service.getRequestDataCount("latest", requests[0]);
+                    mapper = new JsonMapper();
+
+                    System.out.println("[Get Articles Size: " + articleList.size() + " | Total Size: " +count+"]");
+                    jsonResponse = mapper.writeValueAsString(articleList);
+                    System.out.println(jsonResponse);
+                    exchange.getResponseHeaders().set("Content-Type", "application/json;charset=UTF-8");
+                    exchange.getResponseHeaders().set("Total-Count", count+"");
+                    exchange.getResponseHeaders().set("Access-Control-Expose-Headers", "Total-Count"); // 添加這一行前端就可以讀取Header中Total-Count的信息
+                    exchange.sendResponseHeaders(200, jsonResponse.length());
+                    os = exchange.getResponseBody();
+                    os.write(jsonResponse.getBytes("UTF-8"));
+                    os.close();
                 }
+                break;
             }
             case "POST" -> {
                 if(path.equals("/article")){
@@ -131,8 +187,10 @@ public class ArticleHandler implements HttpHandler {
                     exchange.sendResponseHeaders(200, jsonResponse.length());
                     os = exchange.getResponseBody();
                     os.write(jsonResponse.getBytes());
-                    os.close();
+                    requestBody.close();
                 }
+                os.close();
+                break;
             }
             case "PUT" -> {
                 String jsonResponse;
@@ -148,15 +206,17 @@ public class ArticleHandler implements HttpHandler {
                     exchange.sendResponseHeaders(200, jsonResponse.length());
                     os = exchange.getResponseBody();
                     os.write(jsonResponse.getBytes());
-                    os.close();
+                    requestBody.close();
                 }
+                os.close();
+                break;
             }
             case "DELETE" -> {
                 if(path.matches("/article/\\d")){
                     // TODO: Delete article by ID
                 }
             }
-            default -> {}
+            default -> {break;}
         }
     }
 

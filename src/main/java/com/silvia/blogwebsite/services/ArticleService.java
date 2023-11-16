@@ -7,12 +7,15 @@ import com.silvia.blogwebsite.models.Article;
 import java.util.List;
 
 public interface ArticleService {
-    List<ArticleHeaderDto> getArticleByCategory(int cateId);
-    List<ArticleHeaderDto> getArticleByKeyword(String keyword);
+    List<ArticleHeaderDto> getArticleByCategory(int cateId, int start, int size);
+    List<ArticleHeaderDto> getArticleByKeyword(String keyword, int start, int size);
     ArticleHeaderDto getLatestArticle();
     ArticleDto readArticle(int id);
-    List<ArticleHeaderDto> getHighlight(String theme);
-    List<ArticleHeaderDto> getLatest(String theme);
+    List<ArticleHeaderDto> getHighlight(int themeId, int start, int size);
+    List<ArticleHeaderDto> getLatest(int themeId, int start, int size);
+    List<ArticleHeaderDto> getHighlight3(String theme);
+    List<ArticleHeaderDto> getLatest3(String theme);
+    int getRequestDataCount(String type, String conditions);
     void setHighlight(int[] idList, boolean status);
     void updateArticle(int id, Article newContent);
     void deleteArticle(int id);
