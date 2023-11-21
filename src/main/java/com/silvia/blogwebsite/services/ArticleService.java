@@ -10,6 +10,7 @@ public interface ArticleService {
     List<ArticleHeaderDto> getArticleByCategory(int cateId, int start, int size);
     List<ArticleHeaderDto> getArticleByKeyword(String keyword, int start, int size);
     ArticleHeaderDto getLatestArticle();
+    ArticleHeaderDto getLatestWorkArticle();
     ArticleDto readArticle(int id);
     List<ArticleHeaderDto> getHighlight(int themeId, int start, int size);
     List<ArticleHeaderDto> getLatest(int themeId, int start, int size);

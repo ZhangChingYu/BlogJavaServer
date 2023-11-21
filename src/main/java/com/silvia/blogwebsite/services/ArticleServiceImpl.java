@@ -97,6 +97,20 @@ public class ArticleServiceImpl implements ArticleService{
     }
 
     @Override
+    public ArticleHeaderDto getLatestWorkArticle() {
+        try(Connection connection = ConnectionManager.getConnection()){
+            articleDao = new ArticleDao(connection);
+            Article article = articleDao.getLatestWorkArticle();
+            ArticleHeaderDto dto = packArticle(article);
+            ConnectionManager.closeConnection();
+            return dto;
+        }catch (SQLException e){
+            System.out.println("[Sql Connection Disconnected]");
+        }
+        return null;
+    }
+
+    @Override
     public List<ArticleHeaderDto> getHighlight(int themeId, int start, int size) {
         try(Connection connection = ConnectionManager.getConnection()){
             articleDao = new ArticleDao(connection);

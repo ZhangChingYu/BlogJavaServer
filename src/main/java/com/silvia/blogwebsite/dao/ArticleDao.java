@@ -208,6 +208,21 @@ public class ArticleDao {
         return null;
     }
 
+    public Article getLatestWorkArticle(){
+        String sql = "SELECT * FROM "+ tableName+ " WHERE category LIKE ? ORDER BY date DESC LIMIT 1";
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)){
+            preparedStatement.setString(1,"2|%");
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if(resultSet.next()){
+                Article article = new Article(resultSet.getInt("id"), resultSet.getString("title"), resultSet.getTimestamp("date"), resultSet.getString("category"));
+                return article;
+            }
+        } catch (SQLException e) {
+            System.out.println("[Get Latest Article Error]: " + e);
+        }
+        return null;
+    }
+
     // 依照時間排序獲取相應 theme 的文章
     public List<Article> getLatestArticleByTheme(int themeId, int start, int size){
         List<Article> articleList = new ArrayList<>();

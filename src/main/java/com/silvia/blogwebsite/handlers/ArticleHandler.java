@@ -157,7 +157,6 @@ public class ArticleHandler implements HttpHandler {
                     int size = Integer.parseInt(requests[2]);         // the size of the returned data, if the size=-1, than return all.
                     System.out.println("[Getting Theme Id: " + themeId + " | Requested Size: " +size + " | Start From No." + start+"]");
                     List<ArticleHeaderDto> articleList =  service.getLatest(themeId, start, size);
-                    System.out.println("dddd");
                     int count = service.getRequestDataCount("latest", requests[0]);
                     mapper = new JsonMapper();
 
@@ -167,6 +166,18 @@ public class ArticleHandler implements HttpHandler {
                     exchange.getResponseHeaders().set("Content-Type", "application/json;charset=UTF-8");
                     exchange.getResponseHeaders().set("Total-Count", count+"");
                     exchange.getResponseHeaders().set("Access-Control-Expose-Headers", "Total-Count"); // 添加這一行前端就可以讀取Header中Total-Count的信息
+                    exchange.sendResponseHeaders(200, jsonResponse.length());
+                    os = exchange.getResponseBody();
+                    os.write(jsonResponse.getBytes("UTF-8"));
+                    os.close();
+                } else if (path.equals("/article/work/latest")) {
+                    System.out.println("[Get Latest Work Article Starting...");
+                    ArticleHeaderDto headerDto = service.getLatestWorkArticle();
+                    System.out.println("[Article Found]:"+headerDto.toString());
+
+                    mapper = new JsonMapper();
+                    jsonResponse = mapper.writeValueAsString(headerDto);
+                    exchange.getResponseHeaders().set("Content-Type", "application/json;charset=UTF-8");
                     exchange.sendResponseHeaders(200, jsonResponse.length());
                     os = exchange.getResponseBody();
                     os.write(jsonResponse.getBytes("UTF-8"));
