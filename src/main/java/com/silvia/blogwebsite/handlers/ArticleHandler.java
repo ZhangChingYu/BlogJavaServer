@@ -172,11 +172,10 @@ public class ArticleHandler implements HttpHandler {
                     os.close();
                 } else if (path.equals("/article/work/latest")) {
                     System.out.println("[Get Latest Work Article Starting...");
-                    ArticleHeaderDto headerDto = service.getLatestWorkArticle();
-                    System.out.println("[Article Found]:"+headerDto.toString());
-
+                    ArticleHeaderDto dto = service.getLatestWorkArticle();
                     mapper = new JsonMapper();
-                    jsonResponse = mapper.writeValueAsString(headerDto);
+                    jsonResponse = mapper.writeValueAsString(dto);
+
                     exchange.getResponseHeaders().set("Content-Type", "application/json;charset=UTF-8");
                     exchange.sendResponseHeaders(200, jsonResponse.length());
                     os = exchange.getResponseBody();
