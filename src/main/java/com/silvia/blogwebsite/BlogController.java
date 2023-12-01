@@ -1,9 +1,6 @@
 package com.silvia.blogwebsite;
 
-import com.silvia.blogwebsite.handlers.ArticleHandler;
-import com.silvia.blogwebsite.handlers.CategoryHandler;
-import com.silvia.blogwebsite.handlers.HelloHandler;
-import com.silvia.blogwebsite.handlers.PictureHandler;
+import com.silvia.blogwebsite.handlers.*;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -20,6 +17,7 @@ public class BlogController {
         handlers.put(Pattern.compile("/categories.*"), new CategoryHandler());
         handlers.put(Pattern.compile("/images.*"), new PictureHandler());
         handlers.put(Pattern.compile("/article.*"), new ArticleHandler());
+        handlers.put(Pattern.compile("/admin.*"), new LoginHandler());
         handlers.put(Pattern.compile("/hello.*"), new HelloHandler());
     }
 
@@ -30,7 +28,7 @@ public class BlogController {
         Headers headers = exchange.getResponseHeaders();
         headers.add("Access-Control-Allow-Origin", "*"); // 允許所有來源
         headers.add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS"); // 允許的HTTP方法
-        headers.add("Access-Control-Allow-Headers", "Content-Type"); // 允許的HTTP標頭
+        headers.add("Access-Control-Allow-Headers", "Content-Type, Authorization"); // 允許的HTTP標頭
         // 檢查是否為OPTIONS請求
         if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
             // 直接回應OPTIONS請求，不再繼續處理

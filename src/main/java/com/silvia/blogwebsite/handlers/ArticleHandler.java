@@ -171,7 +171,7 @@ public class ArticleHandler implements HttpHandler {
                     os.write(jsonResponse.getBytes("UTF-8"));
                     os.close();
                 } else if (path.equals("/article/work/latest")) {
-                    System.out.println("[Get Latest Work Article Starting...");
+                    System.out.println("[Get Latest Work Article Starting...]");
                     ArticleHeaderDto dto = service.getLatestWorkArticle();
                     mapper = new JsonMapper();
                     jsonResponse = mapper.writeValueAsString(dto);
