@@ -31,7 +31,29 @@ public class ArticleHandler implements HttpHandler {
         switch (method){
             case "GET" -> {
                 String jsonResponse;
-                if(path.matches("/article/\\d+")){
+                if(path.matches("/article/all/.*")){
+                    // 獲取所有 article
+                    System.out.println("[Get All Articles]");
+                    // "/article/all/start/size"
+                    String[] requests = path.replace("/article/all/","").split("/");
+                    int start = Integer.parseInt(requests[0]);        // where the data start
+                    int size = Integer.parseInt(requests[1]);
+                    List<ArticleHeaderDto> headerList = service.getAllArticle(start, size);
+                    System.out.println("[Getting Articles | Requested Size: " +size + " | Start From No." + start+"]");
+                    int count = service.getRequestDataCount("all", "");
+                    System.out.println("[Get All Articles Size: " + headerList.size() + " | Total Size: " +count+"]");
+                    mapper = new JsonMapper();
+
+                    jsonResponse = mapper.writeValueAsString(headerList);
+                    System.out.println(jsonResponse);
+                    exchange.getResponseHeaders().set("Content-Type", "application/json;charset=UTF-8");
+                    exchange.getResponseHeaders().set("Total-Count", count+"");
+                    exchange.getResponseHeaders().set("Access-Control-Expose-Headers", "Total-Count"); // 添加這一行前端就可以讀取Header中Total-Count的信息
+                    exchange.sendResponseHeaders(200, jsonResponse.length());
+                    os = exchange.getResponseBody();
+                    os.write(jsonResponse.getBytes("UTF-8"));
+                    os.close();
+                } else if(path.matches("/article/\\d+")){
                     // 解析 Id
                     int targetId = Integer.parseInt(path.replace("/article/",""));
                     System.out.println("[Get Article]: target id = "+targetId);
@@ -205,7 +227,19 @@ public class ArticleHandler implements HttpHandler {
             case "PUT" -> {
                 String jsonResponse;
                 if(path.equals("/article")){
-
+                    System.out.println("[Article Updating...]");
+                    // 解析 PUT 請求中的 Json 數據，執行更新新文章操作
+                    System.out.println(requestBodyText);
+                    mapper = new ObjectMapper();
+                    ArticleDto articleDto = mapper.readValue(requestBodyText, ArticleDto.class);
+                    // 執行更新 Article 操作
+                    System.out.println("[Updating Article Id]: "+articleDto.getId());
+                    jsonResponse = "Article Updated";
+                    exchange.sendResponseHeaders(200, jsonResponse.length());
+                    os = exchange.getResponseBody();
+                    os.write(jsonResponse.getBytes());
+                    requestBody.close();
+                    os.close();
                 } else if (path.equals("/article/highlight")) {
                     System.out.println("[Start Updating Article Highlight...]");
                     mapper = new ObjectMapper();

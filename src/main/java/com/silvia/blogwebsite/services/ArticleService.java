@@ -18,6 +18,7 @@ public interface ArticleService {
     List<ArticleHeaderDto> getLatest3(String theme);
     int getRequestDataCount(String type, String conditions);
     void setHighlight(int[] idList, boolean status);
+    List<ArticleHeaderDto> getAllArticle(int start, int size);
     void updateArticle(int id, Article newContent);
     void deleteArticle(int id);
     void addArticle(Article article);

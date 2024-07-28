@@ -40,11 +40,13 @@ public class ArticleDao {
         return 0;
     }
 
-    public List<Article> getAll(){
+    public List<Article> getAll(int start, int size){
         List<Article> articleList = new ArrayList<>();
-        String sql = "SELECT * FROM " + tableName;
-        try(Statement statement = connection.createStatement()){
-            ResultSet resultSet = statement.executeQuery(sql);
+        String sql = "SELECT * FROM " + tableName + " ORDER BY date DESC LIMIT ?,?";
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)){
+            preparedStatement.setInt(1, start);
+            preparedStatement.setInt(2, size);
+            ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()){
                 Article article = new Article(resultSet.getInt("id"), resultSet.getString("title"), resultSet.getTimestamp("date"), resultSet.getString("category"));
                 articleList.add(article);
@@ -73,6 +75,20 @@ public class ArticleDao {
             System.out.println("[Get Article By Category Error]" + e);
         }
         return articleList;
+    }
+
+    public  int getArticleTotalSize(){
+        String sql = "SELECT COUNT(*) FROM " + tableName;
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if(resultSet.next()){
+                int count = resultSet.getInt(1);
+                return count;
+            }
+        } catch (SQLException e){
+            System.out.println("[Get Article By Category Error]" + e);
+        }
+        return 0;
     }
 
     public int getByCategoryTotalSize(int categoryId){

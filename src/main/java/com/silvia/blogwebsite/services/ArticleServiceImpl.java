@@ -83,6 +83,20 @@ public class ArticleServiceImpl implements ArticleService{
     }
 
     @Override
+    public List<ArticleHeaderDto> getAllArticle(int start, int size) {
+        try(Connection connection = ConnectionManager.getConnection()){
+            articleDao = new ArticleDao(connection);
+            List<Article> articleList = articleDao.getAll(start, size);
+            List<ArticleHeaderDto> headerList = packArticleList(articleList);
+            ConnectionManager.closeConnection();
+            return headerList;
+        }catch (SQLException e){
+            System.out.println("[Sql Connection Disconnected]");
+        }
+        return null;
+    }
+
+    @Override
     public ArticleHeaderDto getLatestArticle() {
         try(Connection connection = ConnectionManager.getConnection()){
             articleDao = new ArticleDao(connection);
@@ -169,6 +183,14 @@ public class ArticleServiceImpl implements ArticleService{
     @Override
     public int getRequestDataCount(String type, String conditions) {
         switch (type){
+            case "all":
+                try(Connection connection = ConnectionManager.getConnection()){
+                    articleDao = new ArticleDao(connection);
+                    int count = articleDao.getArticleTotalSize();
+                    return count;
+                }catch (SQLException e){
+                    System.out.println("[Sql Connection Disconnected]\n"+e);
+                }
             case "cateId":
                 int cateId = Integer.parseInt(conditions);
                 try (Connection connection = ConnectionManager.getConnection()){

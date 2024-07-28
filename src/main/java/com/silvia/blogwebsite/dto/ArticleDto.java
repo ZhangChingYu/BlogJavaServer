@@ -15,6 +15,8 @@ public class ArticleDto {
     private List<CategoryDto> categoryList;
     private List<Section> sectionList;
 
+    public ArticleDto(){}
+
     public ArticleDto(Article article) {
         this.id = article.getId();
         this.title = article.getTitle();
@@ -23,6 +25,17 @@ public class ArticleDto {
         this.headerType = article.getHeaderType();
         this.date = article.getTimestamp().toString();
         this.sectionList = article.getSectionList();
+    }
+
+    public ArticleDto(int id, String title, String intro, String coverImgUrl, int headerType, String date, List<CategoryDto> categoryList, List<Section> sectionList) {
+        this.id = id;
+        this.title = title;
+        this.intro = intro;
+        this.coverImgUrl = coverImgUrl;
+        this.headerType = headerType;
+        this.date = date;
+        this.categoryList = categoryList;
+        this.sectionList = sectionList;
     }
 
     public List<CategoryDto> getCategoryList() {
@@ -35,6 +48,34 @@ public class ArticleDto {
 
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setIntro(String intro) {
+        this.intro = intro;
+    }
+
+    public void setCoverImgUrl(String coverImgUrl) {
+        this.coverImgUrl = coverImgUrl;
+    }
+
+    public void setHeaderType(int headerType) {
+        this.headerType = headerType;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public void setSectionList(List<Section> sectionList) {
+        this.sectionList = sectionList;
     }
 
     public String getTitle() {
