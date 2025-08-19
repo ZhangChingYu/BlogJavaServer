@@ -1,0 +1,83 @@
+[H]
+[A]
+[T]
+Mafoody (0): Discovering Your Unique Food Preferences with AI — My Journey in Developing an Intelligent Recipe Recommendation System
+[T]
+[I]
+In this era of information overload, we are constantly bombarded with vast amounts of data, making decision-making increasingly difficult. One of the most mundane yet frustrating daily dilemmas is: What should I eat today?
+
+As someone who enjoys browsing recipe websites for inspiration, I’ve experienced firsthand how time-consuming it can be to sift through hundreds of similar recipes to find one that suits my taste and skill level. Sometimes, I randomly pick a recipe only to find that the final dish doesn’t match my expectations, or the instructions are too vague, leading to failure.
+
+This is why I decided to design and implement an intelligent recipe recommendation system that takes into account various influencing factors to provide users with more accurate recommendations.
+
+This project also serves as my university graduation thesis. Given the extensive scope of the project, I will break it down into multiple articles to gradually introduce the entire system. To avoid making the content too academic and dry, I will explain everything in a simple and accessible manner.
+
+I hope these insights will inspire you, and I welcome any discussions or feedback. Let’s dive in!
+[I]
+[P]
+media/image/36/cover.png
+[P]
+[A]
+[H]
+[S]
+[B]
+[T]
+1. System Overview
+[T]
+[I]
+Our core goal is to enhance the accuracy and personalization of recipe recommendations, creating a system that truly "understands" you. The key features of this system include:
+Multi-feature Fusion: Not only does it consider ingredients and cooking methods, but it also incorporates data such as recipe titles, descriptions, author styles, and user reviews.
+Deep Semantic Matching: Utilizes deep learning techniques to analyze recipe text content, understand its semantics, and improve recommendation accuracy.
+Sentiment Analysis: Analyzes user feedback on recipes to ensure recommended dishes not only match their taste but also provide a positive experience.
+Personalized Recommendations: Machine learning models tailor recommendations based on user preferences and historical choices.
+My recipe recommendation system includes the following functionalities:
+
+# Recipe Recommendation Module: Personalized recipe recommendations, popular recipe recommendations, and subscribed author recommendations.
+# Recipe Search Module: Keyword search and category-based search.
+# User Information Module: Login/logout and personal information management.
+# Recipe Management Module: Recipe publishing, recipe favorites, recipe reviews, and recipe subscriptions.
+
+The thought of building such a system from scratch is daunting, but since my graduation thesis topic has been finalized and my proposal submitted, I have no choice but to push forward!
+
+I plan to implement a mobile-based system using the following tools: Django, React Native, MySQL, and Python. The entire process of completing my graduation project is divided into the following stages:
+Step 1: Collect sufficient recipe and user data
+Step 2: Train models using the collected data
+Step 3: Conduct requirement analysis and system design for the recipe recommendation system
+Step 4: Implement a system demo based on the design
+[I]
+[P]
+media/image/36/section1/2.png
+[P]
+[P]
+media/image/36/section1/1.png
+[P]
+[B]
+[B]
+[T]
+2. What is a Recommendation System?
+[T]
+[I]
+As mentioned earlier, we are surrounded by an overwhelming amount of information every day, and finding useful content often requires significant time and effort. Recommendation systems were born to address this issue of information overload. Early recommendation technologies primarily relied on user historical data. For example, e-commerce platforms recommend products based on your purchase history, while streaming platforms suggest videos you might like. However, research on recipe recommendations is relatively scarce. Existing recommendation methods mostly focus on taste, cooking methods, or nutritional content, overlooking other features such as recipe names, authors, descriptions, and even user reviews. These factors actually influence whether someone decides to try a particular dish, which is why I aimed to design a more comprehensive and practical recipe recommendation system.
+
+To tackle this problem, my graduation project employs a Deep Semantic Matching Model (DSSM), an AI technology capable of understanding textual meaning. In simple terms, it doesn’t just mechanically match keywords but analyzes recipe names, descriptions, reviews, and other textual information to understand their semantics, thereby making more accurate recommendations. For example, when a user searches for a dessert suitable for a relaxing weekend, my system not only considers the type of dessert but also analyzes other users’ reviews to identify recipes described as "easy to make" or "amazing in taste," ensuring the recommendations align with real-world needs.
+
+Additionally, I incorporated sentiment analysis technology, enabling the system to interpret user feedback. For instance, if a recipe’s reviews frequently mention "too difficult" or "hard-to-find ingredients," the system will prioritize recommending easier recipes for beginners, enhancing user experience.
+
+Ultimately, I applied this recommendation algorithm to a practical recipe recommendation system, allowing it to provide recommendations not only based on ingredients and cooking methods but also by considering user needs, preferences, and emotional feedback. I hope this system can help more people effortlessly find recipes that suit their tastes and enjoy the fun of cooking!
+[I]
+[P]
+media/image/36/section2/1.png
+[P]
+[B]
+[B]
+[T]
+Preview of the Next Article
+[T]
+[I]
+In the next article, I will introduce the process and methods of data collection, as well as showcase how I cleaned and labeled the data. The article will include code tutorials, so if you’re interested, feel free to try it out! See you in the next article :)
+[I]
+[P]
+media/image/36/section3/1.png
+[P]
+[B]
+[S]
