@@ -12,13 +12,26 @@ public class ConnectionManager{
     // build mysql connection
     public static Connection getConnection() throws SQLException {
         if(connection == null || connection.isClosed()){
-            // read database env variables
-            Dotenv dotenv = Dotenv.load();  // 預設讀專案根目錄 .env
-            String host = dotenv.get("DB_HOST");
-            String port = dotenv.get("DB_PORT");
-            String database = dotenv.get("DB_NAME");
-            String user = dotenv.get("DB_USER");
-            String password = dotenv.get("DB_PASSWORD");
+            String database;
+            String host;
+            String port;
+            String user;
+            String password;
+            // read database env variables (deploy environment
+            if(System.getenv("DB_HOST") != null) {
+                host = System.getenv("DB_HOST");
+                port = System.getenv("DB_PORT");
+                database = System.getenv("DB_NAME");
+                user = System.getenv("DB_USER");
+                password = System.getenv("DB_PASSWORD");
+            } else {
+                Dotenv dotenv = Dotenv.load();  // 預設讀專案根目錄 .env
+                host = dotenv.get("DB_HOST");
+                port = dotenv.get("DB_PORT");
+                database = dotenv.get("DB_NAME");
+                user = dotenv.get("DB_USER");
+                password = dotenv.get("DB_PASSWORD");
+            }
 
             //String jdbcUrl = "jdbc:mysql://localhost:3306/"+database;
             String jdbcUrl = "jdbc:mysql://" + host + ":" + port + "/" + database;
